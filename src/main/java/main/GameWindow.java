@@ -28,8 +28,9 @@ public class GameWindow implements GameWindowInterface {
     public GameWindow(ArrayList<City> cities) {
         this.bundle = Pandemic.bundle;
         this.windowFrame = new JFrame();
-        this.windowFrame.setResizable(false);
+        this.windowFrame.setResizable(true);
         this.windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.windowFrame.setTitle("Pandemic");
 
         this.gamePanel = new JPanel();
         this.gamePanel.setLayout(new BorderLayout());

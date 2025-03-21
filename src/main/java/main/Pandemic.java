@@ -6,9 +6,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Pandemic {
-    public static final int BOARD_WIDTH = 1375;
-    public static final int BOARD_HEIGHT = 875;
-    public static final double DISPLAY_SCALE = 0.625;
+    public static final int BOARD_WIDTH = 2200;
+    public static final int BOARD_HEIGHT = 1400;
     public static final Dimension BOARD_SIZE = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
     private static BoardStatusController boardStatusController;
     public static ResourceBundle bundle;
@@ -29,8 +28,7 @@ public class Pandemic {
     }
 
     private static City createCity(String name, Point location, CityColor color) {
-        Point scaledLocation = new Point((int) (location.x * DISPLAY_SCALE), (int) (location.y * DISPLAY_SCALE));
-        return new City(name, scaledLocation, color);
+        return new City(name, location, color);
     }
 
     public static ArrayList<City> createMap() {
