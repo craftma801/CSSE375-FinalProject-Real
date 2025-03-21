@@ -18,9 +18,14 @@ public class GameBoard extends JComponent {
     protected void paintComponent(Graphics graphics) {
         Graphics2D graphics2D = ((Graphics2D) graphics);
         super.paintComponent(graphics2D);
-        graphics.drawImage(background, 0, 0, Pandemic.BOARD_WIDTH, Pandemic.BOARD_HEIGHT, this);
+        Dimension boardSize = this.getSize();
+        graphics.drawImage(background, 0, 0, boardSize.width, boardSize.height, this);
+        double xScale = boardSize.width / (double) Pandemic.BOARD_WIDTH;
+        double yScale = boardSize.height / (double) Pandemic.BOARD_HEIGHT;
         for (City city : cities) {
-            city.draw(graphics2D, this);
+            city.draw(graphics2D, this, xScale, yScale);
         }
+
+        System.out.println(this.getSize());
     }
 }
