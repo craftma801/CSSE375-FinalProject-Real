@@ -16,6 +16,8 @@ public class City {
     private static final int PAWN_HEIGHT = 35;
     private static final int PAWN_GAP = 2;
 
+    private static final int CITY_RADIUS = 38;
+
     public final String name;
     public final Point location;
 
@@ -246,6 +248,25 @@ public class City {
 
     public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale) {
         location.setScale(xScale, yScale);
+
+        int scaledRadius = (int) (CITY_RADIUS * xScale);
+        Color drawColor;
+        switch (this.color) {
+            case YELLOW:
+                drawColor = new Color(246, 220, 104);
+                break;
+            case RED:
+                drawColor = new Color(255, 142, 142);
+                break;
+            case BLACK:
+                drawColor = new Color(76, 76, 76);
+                break;
+            default:
+                drawColor = new Color(128, 128, 255);
+        }
+        graphics2D.setColor(drawColor.darker().darker());
+        graphics2D.fillOval(location.getX() - scaledRadius, location.getY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
+
         int totalCubes = blueLevel + blackLevel + redLevel + yellowLevel;
         if (hasResearchStation()) {
             drawResearchStation(graphics2D, totalCubes);
