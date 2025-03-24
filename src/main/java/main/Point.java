@@ -25,4 +25,10 @@ public class Point {
     public int getY() {
         return (int) (y * yScale);
     }
+
+    public double getScaledDistance(int destX, int destY) {
+        double xDist = Math.abs(destX - getX()) * xScale;
+        double yDist = Math.abs(destY - getY()) * yScale;
+        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+    }
 }

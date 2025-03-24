@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
 public class GameWindow implements GameWindowInterface {
     public final JFrame windowFrame;
@@ -85,6 +86,10 @@ public class GameWindow implements GameWindowInterface {
                 null,
                 options,
                 null);
+    }
+
+    public CompletableFuture<City> selectCity() {
+        return gameBoard.selectCity();
     }
 
     public void updateTreatmentIndicator(CityColor color, String message) {

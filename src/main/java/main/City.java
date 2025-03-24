@@ -325,4 +325,8 @@ public class City {
     public void addConnection(City connection) {
         connectedCities.add(connection);
     }
+
+    public boolean isClicked(int x, int y) {
+        return location.getScaledDistance(x, y) < 25;
+    }
 }
