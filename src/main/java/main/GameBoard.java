@@ -5,12 +5,14 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 
 public class GameBoard extends JComponent {
     public static final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
     private final Image background;
     private final ArrayList<City> cities;
+    private HashSet<City> selectableCities;
     private CompletableFuture<City> selectedCity;
     private boolean canSelectCity; //Whether or not the user can currently select a city
     private InfoBox selectionInfo;
@@ -32,7 +34,7 @@ public class GameBoard extends JComponent {
         double xScale = boardSize.width / (double) Pandemic.BOARD_WIDTH;
         double yScale = boardSize.height / (double) Pandemic.BOARD_HEIGHT;
         for (City city : cities) {
-            city.draw(graphics2D, this, xScale, yScale);
+            city.draw(graphics2D, this, xScale, yScale, canSelectCity ? selectableCities.contains(city) : true);
         }
         if(canSelectCity) {
             selectionInfo.draw(graphics2D);
@@ -40,8 +42,9 @@ public class GameBoard extends JComponent {
         System.out.println(this.getSize());
     }
 
-    public CompletableFuture<City> selectCity() {
+    public CompletableFuture<City> selectCity(HashSet<City> options) {
         selectedCity = new CompletableFuture<>();
+        selectableCities = options;
         canSelectCity = true;
         return selectedCity;
     }

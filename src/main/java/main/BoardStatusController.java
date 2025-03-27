@@ -125,7 +125,7 @@ public class BoardStatusController {
     }
 
     public boolean handleDriveFerry() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].move(city);
         });
@@ -133,7 +133,7 @@ public class BoardStatusController {
     }
 
     public boolean handleDirectFlight() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].directFlight(city);
         });
@@ -141,7 +141,7 @@ public class BoardStatusController {
     }
 
     public boolean handleCharterFlight() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].charterFlight(city);
         });
@@ -149,7 +149,7 @@ public class BoardStatusController {
     }
 
     public boolean handleShuttleFlight() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].shuttleFlight(city);
         });
@@ -337,20 +337,18 @@ public class BoardStatusController {
 
     private void dispatcherRoleAction() {
         Player selectedPlayer = gameWindow.promptSelectPlayer(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove"));
-        ArrayList<String> possibleLocations = new ArrayList<>();
+        HashSet<City> possibleLocations = new HashSet<>();
         for (Player player : players) {
-            possibleLocations.add(player.getCity().name);
+            possibleLocations.add(player.getCity());
         }
         for (City city : cityMap) {
             if (selectedPlayer.getCity().connectedCities.contains(city)) {
-                possibleLocations.add(city.name);
+                possibleLocations.add(city);
             }
         }
 
-        String selectedLocation = gameWindow.promptSelectOption(possibleLocations.toArray(new String[0]),
-                bundle.getString("selectALocation"), bundle.getString("whereWouldYouLikeToGo"));
-
-        selectedPlayer.forceRelocatePlayer(getCityByName(selectedLocation));
+        CompletableFuture<City> userSelection = gameWindow.selectCity(possibleLocations);
+        userSelection.thenAccept(selectedPlayer::forceRelocatePlayer); //Method reference
     }
 
     private boolean handlePlayEventCard() {
@@ -629,7 +627,7 @@ public class BoardStatusController {
 
     public void airLift() {
         Player selectedPlayer = gameWindow.promptSelectPlayer(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove"));
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept(selectedPlayer::forceRelocatePlayer); //Method reference
     }
 
@@ -688,7 +686,7 @@ public class BoardStatusController {
     }
 
     public void governmentGrant() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity();
+        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             city.buildResearchStation();
         });
