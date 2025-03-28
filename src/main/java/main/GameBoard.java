@@ -55,7 +55,7 @@ public class GameBoard extends JComponent {
             for (City city : cities) {
                 if(city.isClicked(m.getX(), m.getY())) {
                     System.out.println(city.name);
-                    if(canSelectCity) {
+                    if(canSelectCity && selectableCities.contains(city)) {
                         selectedCity.complete(city);
                         canSelectCity = false;
                         this.repaint();

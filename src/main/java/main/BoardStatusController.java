@@ -125,7 +125,7 @@ public class BoardStatusController {
     }
 
     public boolean handleDriveFerry() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
+        CompletableFuture<City> userSelection = gameWindow.selectCity(players[currentPlayerTurn].driveFerryDestinations());
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].move(city);
         });
@@ -133,7 +133,7 @@ public class BoardStatusController {
     }
 
     public boolean handleDirectFlight() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
+        CompletableFuture<City> userSelection = gameWindow.selectCity(players[currentPlayerTurn].directFlightDestinations());
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].directFlight(city);
         });
@@ -149,7 +149,13 @@ public class BoardStatusController {
     }
 
     public boolean handleShuttleFlight() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
+        HashSet<City> citiesWithResearchStation = new HashSet();
+        for(City city : cityMap) {
+            if(city.hasResearchStation()){
+                citiesWithResearchStation.add(city);
+            }
+        }
+        CompletableFuture<City> userSelection = gameWindow.selectCity(citiesWithResearchStation);
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].shuttleFlight(city);
         });
