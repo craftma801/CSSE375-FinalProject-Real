@@ -14,6 +14,7 @@ public class Player {
     protected ArrayList<PlayerCard> cardsInHand;
     public String name;
     protected String displayName;
+    protected String playerNum;
     private Image icon;
     private final ResourceBundle bundle;
 

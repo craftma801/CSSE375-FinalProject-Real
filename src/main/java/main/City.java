@@ -297,9 +297,8 @@ public class City {
             graphics2D.setColor(player.getColor());
             graphics2D.drawImage(coloredPawn, pawnX, pawnBlockY, PAWN_WIDTH, PAWN_HEIGHT, observer);
 
-            String playerNum = "P" + (i + 1);
-            int pNumWidth = fm.stringWidth(playerNum);
-            graphics2D.drawString(playerNum, pawnX + (PAWN_WIDTH - pNumWidth) / 2, pawnBlockY);
+            int pNumWidth = fm.stringWidth(player.playerNum);
+            graphics2D.drawString(player.playerNum, pawnX + (PAWN_WIDTH - pNumWidth) / 2, pawnBlockY);
 
             String role = player.getDisplayName();
             int roleWidth = fm.stringWidth(role);

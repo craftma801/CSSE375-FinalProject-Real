@@ -529,6 +529,7 @@ public class BoardStatusController {
     }
 
     public String generatePlayerName(int playerNumber, Player player) {
+        player.playerNum = "P" + playerNumber;
         String playerClassName = player.getClass().getName();
         String[] roleNameParts = playerClassName.split("\\.");
         String roleName = roleNameParts[roleNameParts.length - 1];
