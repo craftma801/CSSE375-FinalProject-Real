@@ -45,9 +45,8 @@ public class BoardStatusController {
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
 
-        int numOfPlayers = 4 | Integer.parseInt(chooseNumberOfPlayers(gameWindow));
-        this.numPlayers = numOfPlayers;
-        this.players = new Player[numOfPlayers];
+        this.numPlayers = Integer.parseInt(chooseNumberOfPlayers(gameWindow));
+        this.players = new Player[numPlayers];
 
         this.infectionRateValues = new int[]{2, 2, 2, 3, 3, 4, 4};
         this.infectionRateIndex = 0;
@@ -464,45 +463,17 @@ public class BoardStatusController {
     }
 
     private void shuffleEpidemicCardsIntoPlayerDeck() {
-        Stack<PlayerCard> playerDeck1 = new Stack<>();
-        Stack<PlayerCard> playerDeck2 = new Stack<>();
-        Stack<PlayerCard> playerDeck3 = new Stack<>();
-        Stack<PlayerCard> playerDeck4 = new Stack<>();
-        for (int i = 0; i < 10; i++) {
-            playerDeck1.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck2.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck3.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck4.push(playerDeck.pop());
-        }
-        PlayerCard epidemicCard1 = new PlayerCard(true);
-        PlayerCard epidemicCard2 = new PlayerCard(true);
-        PlayerCard epidemicCard3 = new PlayerCard(true);
-        PlayerCard epidemicCard4 = new PlayerCard(true);
-        playerDeck1.push(epidemicCard1);
-        playerDeck2.push(epidemicCard2);
-        playerDeck3.push(epidemicCard3);
-        playerDeck4.push(epidemicCard4);
-        Collections.shuffle(playerDeck1);
-        Collections.shuffle(playerDeck2);
-        Collections.shuffle(playerDeck3);
-        Collections.shuffle(playerDeck4);
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck1.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck2.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck3.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck4.pop());
+        for(int j = 0; j < numPlayers; j++) {
+            Stack<PlayerCard> playerDeck1 = new Stack<>();
+            for (int i = 0; i < 10; i++) {
+                playerDeck1.push(playerDeck.pop());
+            }
+            PlayerCard epidemicCard1 = new PlayerCard(true);
+            playerDeck1.push(epidemicCard1);
+            Collections.shuffle(playerDeck1);
+            for (int i = 0; i < 11; i++) {
+                playerDeck.push(playerDeck1.pop());
+            }
         }
     }
 
