@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class ContingencyPlanner extends Player {
-    public static final Color ROLE_COLOR = Color.decode("0x35f6ec");
+    public static final Color ROLE_COLOR = Color.decode("0x00FFFF");
     public boolean isHoldingEventCard;
     public EventCard heldEventCard;
     private final BoardStatusController bsc;
 
     public ContingencyPlanner(City startingLocation, BoardStatusController bsc) {
         super(ROLE_COLOR, startingLocation);
+        this.displayName = "CP";
         this.isHoldingEventCard = false;
         this.bsc = bsc;
     }

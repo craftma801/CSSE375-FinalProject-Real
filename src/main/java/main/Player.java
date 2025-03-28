@@ -13,6 +13,7 @@ public class Player {
     protected City currentLocation;
     protected ArrayList<PlayerCard> cardsInHand;
     public String name;
+    protected String displayName;
     private Image icon;
     private final ResourceBundle bundle;
 
@@ -210,5 +211,9 @@ public class Player {
 
     public Image getIcon() {
         return icon;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
     }
 }

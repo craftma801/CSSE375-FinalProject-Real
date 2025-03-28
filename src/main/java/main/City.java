@@ -285,10 +285,25 @@ public class City {
         int pawnBlockSize = numPawns * PAWN_WIDTH + (numPawns - 1) * PAWN_GAP;
         int pawnBlockX = location.getX() - (pawnBlockSize) / 2;
         int pawnBlockY = location.getY() - PAWN_HEIGHT;
+
+        FontMetrics fm = graphics2D.getFontMetrics();
+        graphics2D.setFont(new Font("Indicator", Font.BOLD, 12));
+
         for (int i = 0; i < players.size(); i++) {
-            Image coloredPawn = players.get(i).getIcon();
-            graphics2D.drawImage(coloredPawn, pawnBlockX + i * (PAWN_WIDTH + PAWN_GAP),
-                    pawnBlockY, PAWN_WIDTH, PAWN_HEIGHT, observer);
+            Player player = players.get(i);
+            Image coloredPawn = player.getIcon();
+            int pawnX = pawnBlockX + i * (PAWN_WIDTH + PAWN_GAP);
+
+            graphics2D.setColor(player.getColor());
+            graphics2D.drawImage(coloredPawn, pawnX, pawnBlockY, PAWN_WIDTH, PAWN_HEIGHT, observer);
+
+            String playerNum = "P" + (i + 1);
+            int pNumWidth = fm.stringWidth(playerNum);
+            graphics2D.drawString(playerNum, pawnX + (PAWN_WIDTH - pNumWidth) / 2, pawnBlockY);
+
+            String role = player.getDisplayName();
+            int roleWidth = fm.stringWidth(role);
+            graphics2D.drawString(role, pawnX + (PAWN_WIDTH - roleWidth) / 2, pawnBlockY + PAWN_HEIGHT + 12);
         }
     }
 

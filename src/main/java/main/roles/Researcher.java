@@ -7,10 +7,11 @@ import main.PlayerCard;
 import java.awt.*;
 
 public class Researcher extends Player {
-    public static final Color ROLE_COLOR = Color.decode("0x825b15");
+    public static final Color ROLE_COLOR = Color.decode("0x32AB32");
 
     public Researcher(City startLocation) {
         super(ROLE_COLOR, startLocation);
+        this.displayName = "RS";
     }
 
     @Override
