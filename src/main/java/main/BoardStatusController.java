@@ -45,7 +45,7 @@ public class BoardStatusController {
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
 
-        int numOfPlayers = chooseNumberOfPlayers(gameWindow);
+        int numOfPlayers = 4 | Integer.parseInt(chooseNumberOfPlayers(gameWindow));
         this.numPlayers = numOfPlayers;
         this.players = new Player[numOfPlayers];
 
@@ -74,13 +74,12 @@ public class BoardStatusController {
         this.cityMap = cityMap;
     }
 
-    private int chooseNumberOfPlayers(GameWindowInterface gameWindow) {
+    private String chooseNumberOfPlayers(GameWindowInterface gameWindow) {
         String[] playerOptions = {"2", "3", "4"};
 
-        int numPlayers = Integer.parseInt(gameWindow.promptSelectOption(playerOptions,
+        return gameWindow.promptSelectOption(playerOptions,
                                         "Choose Number of Players",
-                                    "Please choose the number of players."));
-        return numPlayers;
+                                    "Please choose the number of players.");
     }
 
     public void handleAction(PlayerAction playerAction) {
