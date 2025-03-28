@@ -18,7 +18,7 @@ public class Pandemic {
         locale = GameWindow.selectLocale("Select your Locale");
         bundle = ResourceBundle.getBundle("messages", locale);
         ArrayList<City> cityMap = createMap();
-        boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap);
+               boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap);
         boardStatusController.setup();
         boardStatusController.startGame();
         boardStatusController.displayGame();

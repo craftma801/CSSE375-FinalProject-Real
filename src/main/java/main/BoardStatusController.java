@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class BoardStatusController {
-    public static final int NUM_PLAYERS = 4;
+    private int numPlayers = 4;
 
     public ArrayList<City> cityMap;
 
@@ -45,7 +45,10 @@ public class BoardStatusController {
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
 
-        this.players = new Player[4];
+        int numOfPlayers = chooseNumberOfPlayers(gameWindow);
+        this.numPlayers = numOfPlayers;
+        this.players = new Player[numOfPlayers];
+
         this.infectionRateValues = new int[]{2, 2, 2, 3, 3, 4, 4};
         this.infectionRateIndex = 0;
 
@@ -54,7 +57,7 @@ public class BoardStatusController {
         this.infectionDeck = new Stack<>();
         this.infectionDiscardPile = new Stack<>();
         this.cubeBank = new DiseaseCubeBank();
-        this.currentPlayerTurn = NUM_PLAYERS;
+        this.currentPlayerTurn = getNumPlayers();
         this.currentPlayerRemainingActions = 0;
         this.outbreakManager = new OutbreakManager(gameWindow);
 
@@ -69,6 +72,15 @@ public class BoardStatusController {
         this.gameOver = false;
 
         this.cityMap = cityMap;
+    }
+
+    private int chooseNumberOfPlayers(GameWindowInterface gameWindow) {
+        String[] playerOptions = {"2", "3", "4"};
+
+        int numPlayers = Integer.parseInt(gameWindow.promptSelectOption(playerOptions,
+                                        "Choose Number of Players",
+                                    "Please choose the number of players."));
+        return numPlayers;
     }
 
     public void handleAction(PlayerAction playerAction) {
@@ -442,7 +454,7 @@ public class BoardStatusController {
         allPossiblePlayers.add(new Scientist(atlanta));
         allPossiblePlayers.add(new QuarantineSpecialist(atlanta));
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < numPlayers; i++) {
             int randomIndex = (int) (Math.random() * allPossiblePlayers.size());
             Player newPlayer = allPossiblePlayers.remove(randomIndex);
             newPlayer.name = generatePlayerName(i + 1, newPlayer);
@@ -536,7 +548,7 @@ public class BoardStatusController {
     }
 
     private void playersDrawStartingHands() {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 6 - numPlayers; i++) {
             for (Player player : this.players) {
                 PlayerCard drawnCard = this.playerDeck.pop();
                 player.drawCard(drawnCard);
@@ -563,7 +575,7 @@ public class BoardStatusController {
 
     public void transferPlayToNextPlayer() {
         currentPlayerTurn++;
-        if (currentPlayerTurn >= NUM_PLAYERS) {
+        if (currentPlayerTurn >= getNumPlayers()) {
             currentPlayerTurn = 0;
         }
         this.currentPlayerRemainingActions = 4;
@@ -843,5 +855,13 @@ public class BoardStatusController {
 
     public void addPlayerCardToDiscardPile(PlayerCard card) {
         this.playerDiscardPile.push(card);
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public void setNumPlayers(int numPlayers) {
+        this.numPlayers = numPlayers;
     }
 }
