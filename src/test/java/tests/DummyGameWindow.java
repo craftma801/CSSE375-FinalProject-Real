@@ -17,7 +17,7 @@ public class DummyGameWindow implements GameWindowInterface {
 
     @Override
     public String promptSelectOption(String[] options, String title, String message) {
-        return "4";
+        return "";
     }
 
     @Override

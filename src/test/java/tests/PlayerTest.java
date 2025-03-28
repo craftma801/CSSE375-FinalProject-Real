@@ -58,12 +58,12 @@ public class PlayerTest {
         basicMap.add(madrid);
         basicMap.add(miami);
 
-        this.bsc = new BoardStatusController(gameWindow, basicMap);
+        this.bsc = new BoardStatusController(gameWindow, basicMap, 4);
     }
 
     @Test
     public void testGetColor() {
-        BoardStatusController bsc = new BoardStatusController(new DummyGameWindow(), new ArrayList<>());
+        BoardStatusController bsc = new BoardStatusController(new DummyGameWindow(), new ArrayList<>(), 4);
         City testCity = new City("Test Town", new Point(8, 12), CityColor.BLACK);
 
         Player researcher = new Researcher(testCity);
@@ -98,7 +98,7 @@ public class PlayerTest {
     @Test
     public void testPlayerNames() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap());
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), 4);
         City testCity = new City("Test Towers", new Point(2, 12), CityColor.YELLOW);
         Player player = new Researcher(testCity);
         player.name = bsc.generatePlayerName(1,player);

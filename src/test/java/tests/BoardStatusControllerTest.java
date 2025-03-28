@@ -54,7 +54,7 @@ public class BoardStatusControllerTest {
         basicMap.add(madrid);
         basicMap.add(miami);
 
-        this.bsc = new BoardStatusController(gameWindow, basicMap);
+        this.bsc = new BoardStatusController(gameWindow, basicMap, 4);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testInitializeInfectionDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap());
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), 4);
         assertEquals(0, this.bsc.infectionDeckSize());
         this.bsc.setup();
         assertEquals(48, this.bsc.infectionDeckSize());
@@ -95,7 +95,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testInfectionDeckAfterGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap());
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), 4);
         this.bsc.setup();
         this.bsc.startGame();
         assertEquals(39, this.bsc.infectionDeckSize());
@@ -354,7 +354,7 @@ public class BoardStatusControllerTest {
     public void testDriveFerry() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(gw, Pandemic.createMap());
+        bsc = new BoardStatusController(gw, Pandemic.createMap(), 4);
         EasyMock.expect(gw.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Chicago");
         EasyMock.expect(gw.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Montreal");
         EasyMock.expect(gw.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("New York");
@@ -463,7 +463,7 @@ public class BoardStatusControllerTest {
     public void testEventCardsAddedToPlayerDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
         ArrayList<City> cityMap = Pandemic.createMap();
-        this.bsc = new BoardStatusController(new DummyGameWindow(), cityMap);
+        this.bsc = new BoardStatusController(new DummyGameWindow(), cityMap, 4);
 
         this.bsc.setup();
         assertEquals(48, this.bsc.playerDeckSize());
@@ -484,7 +484,7 @@ public class BoardStatusControllerTest {
     public void testPlayEventCard() {
         ArrayList<City> cityMap = Pandemic.createMap();
         GameWindow mockedGameWindow = EasyMock.createMock(GameWindow.class);
-        this.bsc = new BoardStatusController(mockedGameWindow, cityMap);
+        this.bsc = new BoardStatusController(mockedGameWindow, cityMap, 4);
 
         Medic medic = new Medic(atlanta);
         this.bsc.players = new Player[]{medic};
@@ -541,7 +541,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testEpidemicAndEventCardsShuffledInAtGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap());
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), 4);
         bsc.setup();
         bsc.startGame();
         assertEquals(49, bsc.playerDeckSize());
@@ -970,7 +970,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testDisplayGame() {
         GameWindowInterface gw = EasyMock.strictMock(GameWindowInterface.class);
-        bsc = new BoardStatusController(gw,Pandemic.createMap());
+        bsc = new BoardStatusController(gw,Pandemic.createMap(), 4);
         gw.showWindow();
         EasyMock.expectLastCall();
         EasyMock.replay(gw);

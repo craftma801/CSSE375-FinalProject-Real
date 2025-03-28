@@ -289,4 +289,17 @@ public class GameWindow implements GameWindowInterface {
         }
         return new Locale("en", "US");
     }
+
+    public static String selectNumberOfPlayers() {
+        JFrame promptFrame = new JFrame();
+        String[] options = new String[]{"2", "3", "4"};
+        return (String) JOptionPane.showInputDialog(
+                promptFrame,
+                "Please Choose Number of Players",
+                "Choose number of players",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                null);
+    }
 }

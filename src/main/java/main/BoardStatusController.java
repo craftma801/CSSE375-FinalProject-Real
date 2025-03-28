@@ -37,7 +37,7 @@ public class BoardStatusController {
 
     private final ResourceBundle bundle;
 
-    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap) {
+    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers) {
         if (Pandemic.bundle != null) {
             this.bundle = Pandemic.bundle;
         } else {
@@ -45,7 +45,7 @@ public class BoardStatusController {
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
 
-        this.numPlayers = Integer.parseInt(chooseNumberOfPlayers(gameWindow));
+        this.numPlayers = numPlayers;
         this.players = new Player[numPlayers];
 
         this.infectionRateValues = new int[]{2, 2, 2, 3, 3, 4, 4};
@@ -71,16 +71,6 @@ public class BoardStatusController {
         this.gameOver = false;
 
         this.cityMap = cityMap;
-    }
-
-    private String chooseNumberOfPlayers(GameWindowInterface gameWindow) {
-        String[] playerOptions = {"2", "3", "4"};
-
-        String strNumPlayers = gameWindow.promptSelectOption(playerOptions,
-                                        "Choose Number of Players",
-                                    "Please choose the number of players.");
-        if(strNumPlayers == null) return "4";
-        return strNumPlayers;
     }
 
     public void handleAction(PlayerAction playerAction) {
@@ -831,9 +821,5 @@ public class BoardStatusController {
 
     public int getNumPlayers() {
         return numPlayers;
-    }
-
-    public void setNumPlayers(int numPlayers) {
-        this.numPlayers = numPlayers;
     }
 }
