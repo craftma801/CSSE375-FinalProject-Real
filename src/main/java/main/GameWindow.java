@@ -5,10 +5,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class GameWindow implements GameWindowInterface {
@@ -88,8 +85,8 @@ public class GameWindow implements GameWindowInterface {
                 null);
     }
 
-    public CompletableFuture<City> selectCity() {
-        return gameBoard.selectCity();
+    public CompletableFuture<City> selectCity(HashSet<City> possibleLocations) {
+        return gameBoard.selectCity(possibleLocations);
     }
 
     public void updateTreatmentIndicator(CityColor color, String message) {

@@ -246,25 +246,28 @@ public class City {
         players.add(player);
     }
 
-    public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale) {
+    public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale, boolean enabled) {
         location.setScale(xScale, yScale);
-
         int scaledRadius = (int) (CITY_RADIUS * xScale);
         Color drawColor;
         switch (this.color) {
             case YELLOW:
-                drawColor = new Color(246, 220, 104);
+                drawColor = new Color(209, 187, 88);
                 break;
             case RED:
-                drawColor = new Color(255, 142, 142);
+                drawColor = new Color(188, 75, 75);
                 break;
             case BLACK:
-                drawColor = new Color(76, 76, 76);
+                drawColor = new Color(80, 80, 80);
                 break;
             default:
-                drawColor = new Color(128, 128, 255);
+                drawColor = new Color(96, 96, 236);
         }
-        graphics2D.setColor(drawColor.darker().darker());
+        if(enabled) {
+            graphics2D.setColor(drawColor);
+        } else {
+            graphics2D.setColor(drawColor.darker().darker());
+        }
         graphics2D.fillOval(location.getX() - scaledRadius, location.getY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
 
         int totalCubes = blueLevel + blackLevel + redLevel + yellowLevel;
