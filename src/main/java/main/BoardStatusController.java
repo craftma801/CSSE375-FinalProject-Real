@@ -76,9 +76,11 @@ public class BoardStatusController {
     private String chooseNumberOfPlayers(GameWindowInterface gameWindow) {
         String[] playerOptions = {"2", "3", "4"};
 
-        return gameWindow.promptSelectOption(playerOptions,
+        String strNumPlayers = gameWindow.promptSelectOption(playerOptions,
                                         "Choose Number of Players",
                                     "Please choose the number of players.");
+        if(strNumPlayers == null) return "4";
+        return strNumPlayers;
     }
 
     public void handleAction(PlayerAction playerAction) {
