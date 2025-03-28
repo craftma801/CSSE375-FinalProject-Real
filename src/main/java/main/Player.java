@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -80,6 +81,10 @@ public class Player {
         throw new ActionFailedException(cannotMoveToCity);
     }
 
+    public HashSet<City> driveFerryDestinations() {
+        return new HashSet<>(currentLocation.connectedCities);
+    }
+
     public void directFlight(City destination) {
         for (int i = 0; i < cardsInHand.size(); i++) {
             City toFlyTo = cardsInHand.get(i).city;
@@ -93,6 +98,14 @@ public class Player {
         }
         String cardMissing = bundle.getString("youDoNotHaveTheCardForThatCity");
         throw new ActionFailedException(cardMissing);
+    }
+
+    public HashSet<City> directFlightDestinations() {
+        HashSet<City> possibleLocations = new HashSet<>();
+        for(PlayerCard card : cardsInHand) {
+            possibleLocations.add(card.city);
+        }
+        return possibleLocations;
     }
 
     public void charterFlight(City destination) {

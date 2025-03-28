@@ -16,6 +16,8 @@ public class City {
     private static final int PAWN_HEIGHT = 35;
     private static final int PAWN_GAP = 2;
 
+    private static final int CITY_RADIUS = 38;
+
     public final String name;
     public final Point location;
 
@@ -244,7 +246,30 @@ public class City {
         players.add(player);
     }
 
-    public void draw(Graphics2D graphics2D, JComponent observer) {
+    public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale, boolean enabled) {
+        location.setScale(xScale, yScale);
+        int scaledRadius = (int) (CITY_RADIUS * xScale);
+        Color drawColor;
+        switch (this.color) {
+            case YELLOW:
+                drawColor = new Color(209, 187, 88);
+                break;
+            case RED:
+                drawColor = new Color(188, 75, 75);
+                break;
+            case BLACK:
+                drawColor = new Color(80, 80, 80);
+                break;
+            default:
+                drawColor = new Color(96, 96, 236);
+        }
+        if(enabled) {
+            graphics2D.setColor(drawColor);
+        } else {
+            graphics2D.setColor(drawColor.darker().darker());
+        }
+        graphics2D.fillOval(location.getX() - scaledRadius, location.getY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
+
         int totalCubes = blueLevel + blackLevel + redLevel + yellowLevel;
         if (hasResearchStation()) {
             drawResearchStation(graphics2D, totalCubes);
@@ -258,8 +283,8 @@ public class City {
     private void drawPawns(Graphics2D graphics2D, JComponent observer) {
         int numPawns = players.size();
         int pawnBlockSize = numPawns * PAWN_WIDTH + (numPawns - 1) * PAWN_GAP;
-        int pawnBlockX = location.x - (pawnBlockSize) / 2;
-        int pawnBlockY = location.y - PAWN_HEIGHT;
+        int pawnBlockX = location.getX() - (pawnBlockSize) / 2;
+        int pawnBlockY = location.getY() - PAWN_HEIGHT;
         for (int i = 0; i < players.size(); i++) {
             Image coloredPawn = players.get(i).getIcon();
             graphics2D.drawImage(coloredPawn, pawnBlockX + i * (PAWN_WIDTH + PAWN_GAP),
@@ -271,8 +296,8 @@ public class City {
         int xOffset = hasResearchStation() ? -CUBE_GAP : CUBE_SIZE + (CUBE_GAP / 2);
         int yOffset = this.players.isEmpty() ? -10 : 5;
 
-        int gridX = this.location.x + xOffset;
-        int gridY = this.location.y + yOffset;
+        int gridX = this.location.getX() + xOffset;
+        int gridY = this.location.getY() + yOffset;
 
         Color cubeColor;
         int yellowRemaining = this.yellowLevel;
@@ -307,8 +332,8 @@ public class City {
         int xOffset = totalCubes > 0 ? 0 : -(RESEARCH_STATION_WIDTH / 2);
         int yOffset = players.isEmpty() ? 10 : 25;
 
-        int stationX = location.x + xOffset;
-        int stationY = location.y + yOffset;
+        int stationX = location.getX() + xOffset;
+        int stationY = location.getY() + yOffset;
 
         int baseRectHeight = (int) (RESEARCH_STATION_HEIGHT * 0.6);
         int baseRectY = stationY - baseRectHeight;
@@ -323,5 +348,9 @@ public class City {
 
     public void addConnection(City connection) {
         connectedCities.add(connection);
+    }
+
+    public boolean isClicked(int x, int y) {
+        return location.getScaledDistance(x, y) < 25;
     }
 }

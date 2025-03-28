@@ -1,6 +1,8 @@
 package main;
 
 import javax.swing.*;
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 public interface GameWindowInterface {
 
@@ -23,4 +25,6 @@ public interface GameWindowInterface {
     void updateInfectionRate(int infectionRate);
     void updateOutbreaks(int outbreaks);
     void updateRemainingActions(int remainingActions);
+
+    CompletableFuture<City> selectCity(HashSet<City> options);
 }

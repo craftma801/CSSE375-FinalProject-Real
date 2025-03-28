@@ -5,10 +5,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class GameWindow implements GameWindowInterface {
     public final JFrame windowFrame;
@@ -28,8 +26,9 @@ public class GameWindow implements GameWindowInterface {
     public GameWindow(ArrayList<City> cities) {
         this.bundle = Pandemic.bundle;
         this.windowFrame = new JFrame();
-        this.windowFrame.setResizable(false);
+        this.windowFrame.setResizable(true);
         this.windowFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.windowFrame.setTitle("Pandemic");
 
         this.gamePanel = new JPanel();
         this.gamePanel.setLayout(new BorderLayout());
@@ -84,6 +83,10 @@ public class GameWindow implements GameWindowInterface {
                 null,
                 options,
                 null);
+    }
+
+    public CompletableFuture<City> selectCity(HashSet<City> possibleLocations) {
+        return gameBoard.selectCity(possibleLocations);
     }
 
     public void updateTreatmentIndicator(CityColor color, String message) {

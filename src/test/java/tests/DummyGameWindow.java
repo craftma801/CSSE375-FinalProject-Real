@@ -3,6 +3,8 @@ package tests;
 import main.*;
 
 import javax.swing.*;
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 public class DummyGameWindow implements GameWindowInterface {
     @Override
@@ -98,5 +100,10 @@ public class DummyGameWindow implements GameWindowInterface {
     @Override
     public void updateRemainingActions(int remainingActions) {
 
+    }
+
+    @Override
+    public CompletableFuture<City> selectCity(HashSet<City> possibleLocations) {
+        return null;
     }
 }
