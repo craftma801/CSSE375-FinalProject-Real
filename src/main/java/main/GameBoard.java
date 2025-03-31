@@ -16,6 +16,8 @@ public class GameBoard extends JComponent {
     private CompletableFuture<City> selectedCity;
     private boolean canSelectCity; //Whether or not the user can currently select a city
     private InfoBox selectionInfo;
+    private InfoBox alertBox;
+    private boolean displayingAlert;
 
     public GameBoard(ArrayList<City> cities) {
         background = defaultToolkit.getImage("assets/PandemicBoard.png");
@@ -23,6 +25,8 @@ public class GameBoard extends JComponent {
         this.enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         canSelectCity = false;
         selectionInfo = new InfoBox(5, 5, 150, "Please select a city.");
+        alertBox = new InfoBox(5, 50, 300, "Alert");
+        displayingAlert = false;
     }
 
     @Override
@@ -38,6 +42,9 @@ public class GameBoard extends JComponent {
         }
         if(canSelectCity) {
             selectionInfo.draw(graphics2D);
+            if(displayingAlert){
+                alertBox.draw(graphics2D);
+            }
         }
         System.out.println(this.getSize());
     }
@@ -58,6 +65,11 @@ public class GameBoard extends JComponent {
                     if(canSelectCity && selectableCities.contains(city)) {
                         selectedCity.complete(city);
                         canSelectCity = false;
+                        displayingAlert = false;
+                        this.repaint();
+                    } else {
+                        alertBox.setText("Cannot move to this city with this action");
+                        displayingAlert = true;
                         this.repaint();
                     }
                 }
