@@ -57,6 +57,7 @@ public class City {
         };
     }
 
+    // Treat Disease Refactoring, Switch statements can be condensed with added parameters.
     public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank) {
         switch (infectionColor) {
             case YELLOW -> {

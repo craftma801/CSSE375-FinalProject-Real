@@ -67,10 +67,13 @@ public class GameBoard extends JComponent {
                         canSelectCity = false;
                         displayingAlert = false;
                         this.repaint();
-                    } else {
-                        alertBox.setText("Cannot move to this city with this action");
-                        displayingAlert = true;
-                        this.repaint();
+                    }
+                    else if(canSelectCity){
+                        JOptionPane.showMessageDialog(null, "You are not allowed to select that city with this action.");
+                        return;
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "No action selected.");
                     }
                 }
             }

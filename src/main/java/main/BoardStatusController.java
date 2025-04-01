@@ -194,7 +194,8 @@ public class BoardStatusController {
     public boolean handleTakeKnowledge() {
         Player takingFrom = gameWindow.promptSelectPlayer(players, bundle.getString("knowledge.take"), bundle.getString("selectThePlayerYouWouldLikeToTakeFrom"));
         if (takingFrom == null) {
-            throw new ActionFailedException("Failed to take knowledge!");
+//            throw new ActionFailedException("Failed to take knowledge!");
+            return false;
         }
         PlayerCard taking = gameWindow.promptSelectPlayerCard(takingFrom.getCardsInHand().toArray(new PlayerCard[0]),
                 bundle.getString("knowledge.share"), bundle.getString("selectCardToShare"));
@@ -204,8 +205,14 @@ public class BoardStatusController {
 
     private boolean handleGiveKnowledge() {
         Player givingTo = gameWindow.promptSelectPlayer(players, bundle.getString("knowledge.give"), bundle.getString("selectThePlayerYouWouldLikeToGiveTo"));
+        if (givingTo == null) {
+            return false;
+        }
         PlayerCard giving = gameWindow.promptSelectPlayerCard(players[currentPlayerTurn].getCardsInHand().toArray(new PlayerCard[0]),
                 bundle.getString("knowledge.share"), bundle.getString("selectCardToShare"));
+        if (giving == null) {
+            return false;
+        }
         players[currentPlayerTurn].shareKnowledgeGive(givingTo, giving);
         return true;
     }
