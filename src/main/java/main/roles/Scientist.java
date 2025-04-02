@@ -10,5 +10,6 @@ public class Scientist extends Player {
 
     public Scientist(City startLocation) {
         super(ROLE_COLOR, startLocation);
+        this.displayName = "SC";
     }
 }

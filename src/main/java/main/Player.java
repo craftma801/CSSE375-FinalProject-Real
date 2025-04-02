@@ -1,5 +1,6 @@
 package main;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
@@ -13,6 +14,8 @@ public class Player {
     protected City currentLocation;
     protected ArrayList<PlayerCard> cardsInHand;
     public String name;
+    protected String displayName;
+    protected String playerNum;
     private Image icon;
     private final ResourceBundle bundle;
 
@@ -140,6 +143,12 @@ public class Player {
                 this.cardsInHand.add(cardToTake);
                 return;
             }
+            // This is so action failed does not show up when canceling or not on the same space as takingFrom player
+            // still needs working, and questions to ask.
+//            else{
+//                JOptionPane.showMessageDialog(null, "Cannot take knowledge from selected player");
+//                return;
+//            }
         }
     }
 
@@ -210,5 +219,9 @@ public class Player {
 
     public Image getIcon() {
         return icon;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
     }
 }

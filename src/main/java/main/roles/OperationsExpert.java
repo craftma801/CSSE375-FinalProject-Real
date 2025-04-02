@@ -7,10 +7,11 @@ import main.Player;
 import java.awt.*;
 
 public class OperationsExpert extends Player {
-    public static final Color ROLE_COLOR = Color.decode("0x5feb3e");
+    public static final Color ROLE_COLOR = Color.decode("0xFF00FF");
 
     public OperationsExpert(City startLocation) {
         super(ROLE_COLOR, startLocation);
+        this.displayName = "OE";
     }
 
     public boolean operationsExpertAction(City destination, String toDiscard) {

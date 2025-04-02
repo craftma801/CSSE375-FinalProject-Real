@@ -67,25 +67,25 @@ public class PlayerTest {
         City testCity = new City("Test Town", new Point(8, 12), CityColor.BLACK);
 
         Player researcher = new Researcher(testCity);
-        assertEquals(Color.decode("0x825b15"), researcher.getColor());
+        assertEquals(Color.decode("0x32AB32"), researcher.getColor());
 
         Player contingencyPlanner = new ContingencyPlanner(testCity, bsc);
-        assertEquals(Color.decode("0x35f6ec"), contingencyPlanner.getColor());
+        assertEquals(Color.decode("0x00FFFF"), contingencyPlanner.getColor());
 
         Player operationsExpert = new OperationsExpert(testCity);
-        assertEquals(Color.decode("0x5feb3e"), operationsExpert.getColor());
+        assertEquals(Color.decode("0xFF00FF"), operationsExpert.getColor());
 
         Player quarantineSpecialist = new QuarantineSpecialist(testCity);
-        assertEquals(Color.decode("0x3d8b4b"), quarantineSpecialist.getColor());
+        assertEquals(Color.decode("0x00FF00"), quarantineSpecialist.getColor());
 
         Player medic = new Medic(testCity);
-        assertEquals(Color.decode("0xe66eda"), medic.getColor());
+        assertEquals(Color.decode("0xAA00FF"), medic.getColor());
 
         Player scientist = new Scientist(testCity);
         assertEquals(Color.decode("0xFFFFFF"), scientist.getColor());
 
         Player dispatcher = new Dispatcher(testCity);
-        assertEquals(Color.decode("0xf9a711"), dispatcher.getColor());
+        assertEquals(Color.decode("0xFFA500"), dispatcher.getColor());
     }
 
     @Test

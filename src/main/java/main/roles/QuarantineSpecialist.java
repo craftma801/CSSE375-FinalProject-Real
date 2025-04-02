@@ -7,12 +7,13 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class QuarantineSpecialist extends Player {
-    public static final Color ROLE_COLOR = Color.decode("0x3d8b4b");
+    public static final Color ROLE_COLOR = Color.decode("0x00FF00");
     public static boolean activeInGame = false;
     public static QuarantineSpecialist currentInstance;
 
     public QuarantineSpecialist(City startLocation) {
         super(ROLE_COLOR, startLocation);
+        this.displayName = "QS";
         activeInGame = true;
         currentInstance = this;
     }

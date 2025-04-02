@@ -1,5 +1,7 @@
 package main;
 
+
+// TODO dataclass refactor (Aron)
 public class Point {
     private final int x;
     private final int y;
