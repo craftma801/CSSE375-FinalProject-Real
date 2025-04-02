@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class BoardStatusController {
-    public static final int NUM_PLAYERS = 4;
+    private int numPlayers = 4;
 
     public ArrayList<City> cityMap;
 
@@ -38,7 +38,7 @@ public class BoardStatusController {
 
     private final ResourceBundle bundle;
 
-    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap) {
+    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers) {
         if (Pandemic.bundle != null) {
             this.bundle = Pandemic.bundle;
         } else {
@@ -46,7 +46,9 @@ public class BoardStatusController {
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
 
-        this.players = new Player[4];
+        this.numPlayers = numPlayers;
+        this.players = new Player[numPlayers];
+
         this.infectionRateValues = new int[]{2, 2, 2, 3, 3, 4, 4};
         this.infectionRateIndex = 0;
 
@@ -55,7 +57,7 @@ public class BoardStatusController {
         this.infectionDeck = new Stack<>();
         this.infectionDiscardPile = new Stack<>();
         this.cubeBank = new DiseaseCubeBank();
-        this.currentPlayerTurn = NUM_PLAYERS;
+        this.currentPlayerTurn = getNumPlayers();
         this.currentPlayerRemainingActions = 0;
         this.outbreakManager = new OutbreakManager(gameWindow);
 
@@ -459,7 +461,7 @@ public class BoardStatusController {
         allPossiblePlayers.add(new Scientist(atlanta));
         allPossiblePlayers.add(new QuarantineSpecialist(atlanta));
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < numPlayers; i++) {
             int randomIndex = (int) (Math.random() * allPossiblePlayers.size());
             Player newPlayer = allPossiblePlayers.remove(randomIndex);
             newPlayer.name = generatePlayerName(i + 1, newPlayer);
@@ -470,45 +472,17 @@ public class BoardStatusController {
     }
 
     private void shuffleEpidemicCardsIntoPlayerDeck() {
-        Stack<PlayerCard> playerDeck1 = new Stack<>();
-        Stack<PlayerCard> playerDeck2 = new Stack<>();
-        Stack<PlayerCard> playerDeck3 = new Stack<>();
-        Stack<PlayerCard> playerDeck4 = new Stack<>();
-        for (int i = 0; i < 10; i++) {
-            playerDeck1.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck2.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck3.push(playerDeck.pop());
-        }
-        for (int i = 0; i < 10; i++) {
-            playerDeck4.push(playerDeck.pop());
-        }
-        PlayerCard epidemicCard1 = new PlayerCard(true);
-        PlayerCard epidemicCard2 = new PlayerCard(true);
-        PlayerCard epidemicCard3 = new PlayerCard(true);
-        PlayerCard epidemicCard4 = new PlayerCard(true);
-        playerDeck1.push(epidemicCard1);
-        playerDeck2.push(epidemicCard2);
-        playerDeck3.push(epidemicCard3);
-        playerDeck4.push(epidemicCard4);
-        Collections.shuffle(playerDeck1);
-        Collections.shuffle(playerDeck2);
-        Collections.shuffle(playerDeck3);
-        Collections.shuffle(playerDeck4);
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck1.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck2.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck3.pop());
-        }
-        for (int i = 0; i < 11; i++) {
-            playerDeck.push(playerDeck4.pop());
+        for(int j = 0; j < numPlayers; j++) {
+            Stack<PlayerCard> playerDeck1 = new Stack<>();
+            for (int i = 0; i < 10; i++) {
+                playerDeck1.push(playerDeck.pop());
+            }
+            PlayerCard epidemicCard1 = new PlayerCard(true);
+            playerDeck1.push(epidemicCard1);
+            Collections.shuffle(playerDeck1);
+            for (int i = 0; i < 11; i++) {
+                playerDeck.push(playerDeck1.pop());
+            }
         }
     }
 
@@ -554,7 +528,7 @@ public class BoardStatusController {
     }
 
     private void playersDrawStartingHands() {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 6 - numPlayers; i++) {
             for (Player player : this.players) {
                 PlayerCard drawnCard = this.playerDeck.pop();
                 player.drawCard(drawnCard);
@@ -581,7 +555,7 @@ public class BoardStatusController {
 
     public void transferPlayToNextPlayer() {
         currentPlayerTurn++;
-        if (currentPlayerTurn >= NUM_PLAYERS) {
+        if (currentPlayerTurn >= getNumPlayers()) {
             currentPlayerTurn = 0;
         }
         this.currentPlayerRemainingActions = 4;
@@ -861,5 +835,9 @@ public class BoardStatusController {
 
     public void addPlayerCardToDiscardPile(PlayerCard card) {
         this.playerDiscardPile.push(card);
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
     }
 }
