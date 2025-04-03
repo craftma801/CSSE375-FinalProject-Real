@@ -132,5 +132,6 @@ public class PlayerSteps {
     @And("A quarantine specialist on the city")
     public void aQuarantineSpecialistOnTheCity() {
         testPlayer = new QuarantineSpecialist(CitySteps.testCity);
+        CitySteps.testCity.addPawn(testPlayer);
     }
 }

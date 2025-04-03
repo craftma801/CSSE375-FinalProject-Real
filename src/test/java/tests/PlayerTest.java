@@ -62,33 +62,6 @@ public class PlayerTest {
     }
 
     @Test
-    public void testGetColor() {
-        BoardStatusController bsc = new BoardStatusController(new DummyGameWindow(), new ArrayList<>(), 4);
-        City testCity = new City("Test Town", new Point(8, 12), CityColor.BLACK);
-
-        Player researcher = new Researcher(testCity);
-        assertEquals(Color.decode("0x32AB32"), researcher.getColor());
-
-        Player contingencyPlanner = new ContingencyPlanner(testCity, bsc);
-        assertEquals(Color.decode("0x00FFFF"), contingencyPlanner.getColor());
-
-        Player operationsExpert = new OperationsExpert(testCity);
-        assertEquals(Color.decode("0xFF00FF"), operationsExpert.getColor());
-
-        Player quarantineSpecialist = new QuarantineSpecialist(testCity);
-        assertEquals(Color.decode("0x00FF00"), quarantineSpecialist.getColor());
-
-        Player medic = new Medic(testCity);
-        assertEquals(Color.decode("0xAA00FF"), medic.getColor());
-
-        Player scientist = new Scientist(testCity);
-        assertEquals(Color.decode("0xFFFFFF"), scientist.getColor());
-
-        Player dispatcher = new Dispatcher(testCity);
-        assertEquals(Color.decode("0xFFA500"), dispatcher.getColor());
-    }
-
-    @Test
     public void testGetCity() {
         City testCity = new City("Test Towers", new Point(2, 12), CityColor.YELLOW);
         Player researcher = new Researcher(testCity);

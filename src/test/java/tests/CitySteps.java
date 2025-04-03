@@ -74,7 +74,7 @@ public class CitySteps {
 
     @Then("the city will not be infected")
     public void theCityWillNotBeInfected() {
-        assertEquals(testCity.getInfectionLevel(CityColor.BLUE), 0);
+        assertEquals(0, testCity.getInfectionLevel(CityColor.BLUE));
     }
 
     @And("the cities are connected")

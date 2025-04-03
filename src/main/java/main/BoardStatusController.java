@@ -3,6 +3,7 @@ package main;
 import main.roles.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -422,6 +423,18 @@ public class BoardStatusController {
             this.playerDeck.add(cardToAdd);
         }
         Collections.shuffle(this.playerDeck);
+    }
+
+    public void initFourGenericPlayers() {
+        City atlanta = getCityByName(bundle.getString("atlanta"));
+
+        for (int i = 0; i < 4; i++) {
+            Player newPlayer = new Player(Color.BLACK, atlanta);
+            newPlayer.name = generatePlayerName(i + 1, newPlayer);
+            players[i] = newPlayer;
+            atlanta.players.add(newPlayer);
+        }
+        playersDrawStartingHands();
     }
 
     public void initializePlayers() {

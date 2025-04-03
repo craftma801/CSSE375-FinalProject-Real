@@ -5,6 +5,7 @@ import main.roles.QuarantineSpecialist;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class City {
     public static final int RESEARCH_STATION_WIDTH = 20;
@@ -26,10 +27,8 @@ public class City {
     public ArrayList<Player> players;
     public ArrayList<City> connectedCities;
 
-    private int yellowLevel;
-    private int redLevel;
-    private int blueLevel;
-    private int blackLevel;
+    private final HashMap<CityColor, Integer> diseaseLevels;
+
     private boolean hasResearchStation;
     public boolean outbreakIsHappening;
 
@@ -38,186 +37,68 @@ public class City {
         this.location = cityLocation;
         this.color = color;
         this.players = new ArrayList<>();
-        this.yellowLevel = 0;
-        this.redLevel = 0;
-        this.blueLevel = 0;
-        this.blackLevel = 0;
+        diseaseLevels = new HashMap<>();
+        diseaseLevels.put(CityColor.YELLOW, 0);
+        diseaseLevels.put(CityColor.RED, 0);
+        diseaseLevels.put(CityColor.BLUE, 0);
+        diseaseLevels.put(CityColor.BLACK, 0);
         this.hasResearchStation = false;
         this.connectedCities = new ArrayList<>();
         this.outbreakIsHappening = false;
     }
 
     public int getInfectionLevel(CityColor color) {
-        return switch (color) {
-            case YELLOW -> yellowLevel;
-            case RED -> redLevel;
-            case BLUE -> blueLevel;
-            case BLACK -> blackLevel;
-            default -> 0;
-        };
+        return diseaseLevels.get(color);
     }
 
-    // Treat Disease Refactoring, Switch statements can be condensed with added parameters. (TODO)
     public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank) {
-        switch (infectionColor) {
-            case YELLOW -> {
-                return (treatYellow(false, diseaseCubeBank));
-            }
-            case RED -> {
-                return (treatRed(false, diseaseCubeBank));
-            }
-            case BLUE -> {
-                return (treatBlue(false, diseaseCubeBank));
-            }
-            case BLACK -> {
-                return (treatBlack(false, diseaseCubeBank));
-            }
-        }
-        return false;
+        return this.treatDisease(infectionColor, diseaseCubeBank, false);
     }
 
     public boolean medicTreatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank) {
-        switch (infectionColor) {
-            case YELLOW -> {
-                return (treatYellow(true, diseaseCubeBank));
-            }
-            case RED -> {
-                return (treatRed(true, diseaseCubeBank));
-            }
-            case BLUE -> {
-                return (treatBlue(true, diseaseCubeBank));
-            }
-            case BLACK -> {
-                return (treatBlack(true, diseaseCubeBank));
-            }
-        }
-        throw new InvalidColorException(infectionColor + " is not a valid city color");
+        return this.treatDisease(infectionColor, diseaseCubeBank, true);
     }
 
-    private boolean treatBlack(boolean isMedic, DiseaseCubeBank diseaseCubeBank) {
-        if (this.blackLevel > 0) {
+    public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
+        int diseaseAmount = diseaseLevels.get(infectionColor);
+        if (diseaseAmount > 0) {
             if (isMedic) {
-                int blackAmount = blackLevel;
-                for (int i = blackAmount; i > 0; i--) {
-                    this.blackLevel--;
-                    diseaseCubeBank.colorTreated(CityColor.BLACK);
+                diseaseLevels.put(infectionColor, 0);
+                for (int i = diseaseAmount; i > 0; i--) {
+                    diseaseCubeBank.colorTreated(infectionColor);
                 }
                 return true;
             } else {
-                this.blackLevel--;
-                diseaseCubeBank.colorTreated(CityColor.BLACK);
+                diseaseLevels.put(infectionColor, diseaseAmount - 1);
+                diseaseCubeBank.colorTreated(infectionColor);
                 return true;
             }
         }
         return false;
     }
 
-    private boolean treatBlue(boolean isMedic, DiseaseCubeBank diseaseCubeBank) {
-        if (this.blueLevel > 0) {
-            if (isMedic) {
-                int blueAmount = blueLevel;
-                for (int i = blueAmount; i > 0; i--) {
-                    this.blueLevel--;
-                    diseaseCubeBank.colorTreated(CityColor.BLUE);
-                }
+    private boolean hasQuarantineSpecialist() {
+        for (Player player : players)
+            if(player.getClass() == QuarantineSpecialist.class)
                 return true;
-            } else {
-                this.blueLevel--;
-                diseaseCubeBank.colorTreated(CityColor.BLUE);
-                return true;
-            }
-        }
         return false;
     }
 
-    private boolean treatRed(boolean isMedic, DiseaseCubeBank diseaseCubeBank) {
-        if (this.redLevel > 0) {
-            if (isMedic) {
-                int redAmount = redLevel;
-                for (int i = redAmount; i > 0; i--) {
-                    this.redLevel--;
-                    diseaseCubeBank.colorTreated(CityColor.RED);
-                }
+    private boolean quarantineSpecialistNearby() {
+        for(City city : connectedCities)
+            if(city.hasQuarantineSpecialist())
                 return true;
-            } else {
-                this.redLevel--;
-                diseaseCubeBank.colorTreated(CityColor.RED);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean treatYellow(boolean isMedic, DiseaseCubeBank diseaseCubeBank) {
-        if (this.yellowLevel > 0) {
-            if (isMedic) {
-                int yellowAmount = yellowLevel;
-                for (int i = yellowAmount; i > 0; i--) {
-                    this.yellowLevel--;
-                    diseaseCubeBank.colorTreated(CityColor.YELLOW);
-                }
-                return true;
-            } else {
-                this.yellowLevel--;
-                diseaseCubeBank.colorTreated(CityColor.YELLOW);
-                return true;
-            }
-        }
-        return false;
+        return this.hasQuarantineSpecialist();
     }
 
     public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        if (QuarantineSpecialist.blockingInfection(this))
+        if (quarantineSpecialistNearby())
             return;
-        switch (infectionColor) {
-            case YELLOW -> {
-                infectYellow(diseaseCubeBank, outbreakManager);
-            }
-            case RED -> {
-                infectRed(diseaseCubeBank, outbreakManager);
-            }
-            case BLUE -> {
-                infectBlue(diseaseCubeBank, outbreakManager);
-            }
-            case BLACK -> {
-                infectBlack(diseaseCubeBank, outbreakManager);
-            }
-        }
-    }
-
-    public void infectYellow(DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        if (this.yellowLevel >= 3) {
-            outbreak(CityColor.YELLOW, diseaseCubeBank, outbreakManager);
+        if (diseaseLevels.get(infectionColor) >= 3) {
+            outbreak(infectionColor, diseaseCubeBank, outbreakManager);
         } else {
-            this.yellowLevel++;
-            diseaseCubeBank.cityInfected(CityColor.YELLOW);
-        }
-    }
-
-    public void infectBlack(DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        if (this.blackLevel >= 3) {
-            outbreak(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        } else {
-            this.blackLevel++;
-            diseaseCubeBank.cityInfected(CityColor.BLACK);
-        }
-    }
-
-    public void infectBlue(DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        if (this.blueLevel >= 3) {
-            outbreak(CityColor.BLUE, diseaseCubeBank, outbreakManager);
-        } else {
-            this.blueLevel++;
-            diseaseCubeBank.cityInfected(CityColor.BLUE);
-        }
-    }
-
-    public void infectRed(DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        if (this.redLevel >= 3) {
-            outbreak(CityColor.RED, diseaseCubeBank, outbreakManager);
-        } else {
-            this.redLevel++;
-            diseaseCubeBank.cityInfected(CityColor.RED);
+            diseaseLevels.put(infectionColor, diseaseLevels.get(infectionColor) + 1);
+            diseaseCubeBank.cityInfected(infectionColor);
         }
     }
 
@@ -247,23 +128,23 @@ public class City {
         players.add(player);
     }
 
+    private int getTotalNumCubes() {
+        int total = 0;
+        for(int diseaseLevel : diseaseLevels.values()){
+            total += diseaseLevel;
+        }
+        return total;
+    }
+
     public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale, boolean enabled) {
         location.setScale(xScale, yScale);
         int scaledRadius = (int) (CITY_RADIUS * xScale);
-        Color drawColor;
-        switch (this.color) {
-            case YELLOW:
-                drawColor = new Color(209, 187, 88);
-                break;
-            case RED:
-                drawColor = new Color(188, 75, 75);
-                break;
-            case BLACK:
-                drawColor = new Color(80, 80, 80);
-                break;
-            default:
-                drawColor = new Color(96, 96, 236);
-        }
+        Color drawColor = switch (this.color) {
+            case YELLOW -> new Color(209, 187, 88);
+            case RED -> new Color(188, 75, 75);
+            case BLACK -> new Color(80, 80, 80);
+            default -> new Color(96, 96, 236);
+        };
         if(enabled) {
             graphics2D.setColor(drawColor);
         } else {
@@ -271,12 +152,11 @@ public class City {
         }
         graphics2D.fillOval(location.getX() - scaledRadius, location.getY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
 
-        int totalCubes = blueLevel + blackLevel + redLevel + yellowLevel;
         if (hasResearchStation()) {
-            drawResearchStation(graphics2D, totalCubes);
+            drawResearchStation(graphics2D, getTotalNumCubes());
         }
-        if (totalCubes > 0) {
-            drawCubes(graphics2D, totalCubes);
+        if (getTotalNumCubes() > 0) {
+            drawCubes(graphics2D, getTotalNumCubes());
         }
         drawPawns(graphics2D, observer);
     }
@@ -315,9 +195,9 @@ public class City {
         int gridY = this.location.getY() + yOffset;
 
         Color cubeColor;
-        int yellowRemaining = this.yellowLevel;
-        int redRemaining = this.redLevel;
-        int blueRemaining = this.blueLevel;
+        int yellowRemaining = diseaseLevels.get(Color.YELLOW);
+        int redRemaining = diseaseLevels.get(Color.RED);
+        int blueRemaining = diseaseLevels.get(Color.BLUE);
         for (int i = 0; i < totalCubes; i++) {
             if (yellowRemaining > 0) {
                 cubeColor = Color.YELLOW;
