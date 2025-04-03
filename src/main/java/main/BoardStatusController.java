@@ -270,7 +270,7 @@ public class BoardStatusController {
             color = getCityByName(selectedCards[0]).color;
             if (color != getCityByName(selectedCards[i]).color) {
                 undoCureSelection(currentPlayer, i + 1);
-                return CityColor.EVENT_COLOR;
+                throw new ActionFailedException("You do not have the right cards for this operation!");
             }
         }
         return color;

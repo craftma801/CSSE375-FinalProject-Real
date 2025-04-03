@@ -25,6 +25,6 @@ public class DiseaseCubeBankTest {
     @Test
     public void testRemainingCubesInvalid() {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        assertEquals(-1, diseaseCubeBank.remainingCubes(CityColor.EVENT_COLOR));
+        assertThrows(InvalidColorException.class, () -> diseaseCubeBank.remainingCubes(CityColor.EVENT_COLOR));
     }
 }
