@@ -25,10 +25,7 @@ public class BoardStatusController {
     public int infectionRateIndex;
     public DiseaseCubeBank cubeBank;
 
-    private DiseaseStatus yellowDiseaseStatus;
-    private DiseaseStatus redDiseaseStatus;
-    private DiseaseStatus blueDiseaseStatus;
-    private DiseaseStatus blackDiseaseStatus;
+    private HashMap<CityColor, DiseaseStatus> diseaseStatuses;
 
     public GameWindowInterface gameWindow;
     public boolean isQuietNight;
@@ -61,10 +58,11 @@ public class BoardStatusController {
         this.currentPlayerRemainingActions = 0;
         this.outbreakManager = new OutbreakManager(gameWindow);
 
-        this.yellowDiseaseStatus = DiseaseStatus.ACTIVE;
-        this.redDiseaseStatus = DiseaseStatus.ACTIVE;
-        this.blueDiseaseStatus = DiseaseStatus.ACTIVE;
-        this.blackDiseaseStatus = DiseaseStatus.ACTIVE;
+        this.diseaseStatuses = new HashMap<>();
+        this.diseaseStatuses.put(CityColor.YELLOW, DiseaseStatus.ACTIVE);
+        this.diseaseStatuses.put(CityColor.RED, DiseaseStatus.ACTIVE);
+        this.diseaseStatuses.put(CityColor.BLUE, DiseaseStatus.ACTIVE);
+        this.diseaseStatuses.put(CityColor.BLACK, DiseaseStatus.ACTIVE);
 
         this.gameWindow = gameWindow;
 
@@ -99,17 +97,10 @@ public class BoardStatusController {
         if (actionWasPerformed) {
             currentPlayerRemainingActions--;
             gameWindow.updateRemainingActions(currentPlayerRemainingActions);
-            if (cubeBank.remainingCubes(CityColor.YELLOW) == 24 && this.yellowDiseaseStatus.equals(DiseaseStatus.CURED)) {
-                this.yellowDiseaseStatus = DiseaseStatus.ERADICATED;
-            }
-            if (cubeBank.remainingCubes(CityColor.BLUE) == 24 && this.blueDiseaseStatus.equals(DiseaseStatus.CURED)) {
-                this.blueDiseaseStatus = DiseaseStatus.ERADICATED;
-            }
-            if (cubeBank.remainingCubes(CityColor.BLACK) == 24 && this.blackDiseaseStatus.equals(DiseaseStatus.CURED)) {
-                this.blackDiseaseStatus = DiseaseStatus.ERADICATED;
-            }
-            if (cubeBank.remainingCubes(CityColor.RED) == 24 && this.redDiseaseStatus.equals(DiseaseStatus.CURED)) {
-                this.redDiseaseStatus = DiseaseStatus.ERADICATED;
+            for(CityColor color : diseaseStatuses.keySet()){
+                if (cubeBank.remainingCubes(color) == 24 && diseaseStatuses.get(color).equals(DiseaseStatus.CURED)) {
+                    diseaseStatuses.put(color, DiseaseStatus.ERADICATED);
+                }
             }
             gameWindow.repaintGameBoard();
         }
@@ -178,13 +169,7 @@ public class BoardStatusController {
         if (colorToTreat == null) {
             throw new ActionFailedException("Failed to treat disease!");
         }
-        DiseaseStatus status = switch (colorToTreat) {
-            case YELLOW -> yellowDiseaseStatus;
-            case RED -> redDiseaseStatus;
-            case BLUE -> blueDiseaseStatus;
-            case BLACK -> blackDiseaseStatus;
-            default -> throw new ActionFailedException("Invalid color to treat!");
-        };
+        DiseaseStatus status = diseaseStatuses.get(colorToTreat);
         if (status.equals(DiseaseStatus.CURED)) {
             players[currentPlayerTurn].getCity().medicTreatDisease(colorToTreat, cubeBank);
         } else {
@@ -293,30 +278,19 @@ public class BoardStatusController {
 
     public void cureDisease(CityColor color) {
         String cured = bundle.getString("cured");
-        switch (color) {
-            case YELLOW -> {
-                yellowDiseaseStatus = DiseaseStatus.CURED;
-                gameWindow.updateTreatmentIndicator(CityColor.YELLOW, cured);
-            }
-            case RED -> {
-                redDiseaseStatus = DiseaseStatus.CURED;
-                gameWindow.updateTreatmentIndicator(CityColor.RED, cured);
-            }
-            case BLUE -> {
-                blueDiseaseStatus = DiseaseStatus.CURED;
-                gameWindow.updateTreatmentIndicator(CityColor.BLUE, cured);
-            }
-            case BLACK -> {
-                blackDiseaseStatus = DiseaseStatus.CURED;
-                gameWindow.updateTreatmentIndicator(CityColor.BLACK, cured);
-            }
-        }
-        if (yellowDiseaseStatus == DiseaseStatus.CURED
-                && redDiseaseStatus == DiseaseStatus.CURED
-                && blueDiseaseStatus == DiseaseStatus.CURED
-                && blackDiseaseStatus == DiseaseStatus.CURED) {
+        diseaseStatuses.put(color, DiseaseStatus.CURED);
+        gameWindow.updateTreatmentIndicator(color, cured);
+        if (allDiseasesCured()) {
             gameEnd(GameEndCondition.WIN_ALL_FOUR_CURES_DISCOVERED);
         }
+    }
+
+    private boolean allDiseasesCured() {
+        for(DiseaseStatus diseaseStatus : diseaseStatuses.values()){
+            if(diseaseStatus != DiseaseStatus.CURED)
+                return false;
+        }
+        return true;
     }
 
     private boolean handleRoleAction(Player currentPlayer) {
@@ -585,23 +559,11 @@ public class BoardStatusController {
 
     private DiseaseStatus selectColorOfStatus(InfectionCard currentCard) {
         CityColor color = currentCard.getCityColor();
-        return switch (color) {
-            case YELLOW -> yellowDiseaseStatus;
-            case RED -> redDiseaseStatus;
-            case BLUE -> blueDiseaseStatus;
-            case BLACK -> blackDiseaseStatus;
-            case EVENT_COLOR -> null;
-        };
+        return diseaseStatuses.get(color);
     }
 
     public DiseaseStatus getStatus(CityColor color) {
-        return switch (color) {
-            case YELLOW -> yellowDiseaseStatus;
-            case RED -> redDiseaseStatus;
-            case BLUE -> blueDiseaseStatus;
-            case BLACK -> blackDiseaseStatus;
-            default -> DiseaseStatus.ACTIVE;
-        };
+        return diseaseStatuses.get(color);
     }
 
     public int getInfectionRate() {
