@@ -41,7 +41,7 @@ public class CitySteps {
     @And("a {string} disease level of {int}")
     public void aDiseaseLevelOf(String color, int level) {
         for (int i = 0; i < level; i++) {
-            testCity.infect(stringToEnum(color), diseaseCubeBank, outbreakManager);
+            diseaseCubeBank.infectCity(testCity, stringToEnum(color), outbreakManager);
         }
     }
 
@@ -57,7 +57,7 @@ public class CitySteps {
 
     @When("an additional {string} cube is added")
     public void anAdditionalCubeIsAdded(String color) {
-        testCity.infect(stringToEnum(color), diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(testCity, stringToEnum(color), outbreakManager);
     }
 
     @And("a second city {string} with color {string}")
@@ -69,7 +69,7 @@ public class CitySteps {
 
     @When("an attempt is made to infect the city")
     public void anAttemptIsMadeToInfectTheCity() {
-        testCity.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(testCity, CityColor.BLUE, outbreakManager);
     }
 
     @Then("the city will not be infected")
@@ -85,11 +85,11 @@ public class CitySteps {
 
     @When("an attempt is made to infect the second city")
     public void anAttemptIsMadeToInfectTheSecondCity() {
-        testCity2.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(testCity2, CityColor.BLUE, outbreakManager);
     }
 
     @Then("the second city will not be infected")
     public void theSecondCityWillNotBeInfected() {
-        testCity2.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(testCity2, CityColor.BLUE, outbreakManager);
     }
 }

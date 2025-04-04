@@ -27,16 +27,16 @@ public class CityTest {
     @Test
     public void testInfectionLevelOneRed(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        this.testCity.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
         assertEquals(1,this.testCity.getInfectionLevel(CityColor.RED));
     }
 
     @Test
     public void testInfectPastThreeRed(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        this.testCity.infect(CityColor.RED,diseaseCubeBank, outbreakManager);
-        this.testCity.infect(CityColor.RED,diseaseCubeBank, outbreakManager);
-        this.testCity.infect(CityColor.RED,diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
         assertEquals(3,this.testCity.getInfectionLevel(CityColor.RED));
     }
 
@@ -44,10 +44,10 @@ public class CityTest {
     public void testOutbreaksActivate(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
-        atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
-        atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
-        atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
-        atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
+        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
+        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
+        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
         assertEquals(1,outbreakManager.getOutbreaks());
         assertEquals(3,atlanta.getInfectionLevel(CityColor.BLUE));
     }
@@ -61,17 +61,17 @@ public class CityTest {
         taipei.addConnection(hongKong);
         hongKong.addConnection(taipei);
 
-        taipei.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
-        taipei.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
-        taipei.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
-        taipei.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
 
         taipei.outbreakIsHappening = false;
         hongKong.outbreakIsHappening = false;
 
-        hongKong.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
-        hongKong.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
-        hongKong.infect(CityColor.RED, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
+        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
 
         assertEquals(3, outbreakManager.getOutbreaks());
     }
@@ -85,14 +85,14 @@ public class CityTest {
         baghdad.addConnection(istanbul);
         istanbul.addConnection(baghdad);
 
-        baghdad.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        baghdad.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        baghdad.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        baghdad.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
+        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
+        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
+        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
 
-        istanbul.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        istanbul.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
-        istanbul.infect(CityColor.BLACK, diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
+        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
+        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
 
         assertEquals(2, outbreakManager.getOutbreaks());
     }
@@ -132,7 +132,7 @@ public class CityTest {
     @Test
     public void testTreatDisease(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        this.testCity.infect(CityColor.YELLOW,diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
         this.testCity.treatDisease(CityColor.YELLOW,diseaseCubeBank);
         assertEquals(0,this.testCity.getInfectionLevel(CityColor.YELLOW));
     }
@@ -140,8 +140,8 @@ public class CityTest {
     @Test
     public void testTreatDisease2(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        this.testCity.infect(CityColor.YELLOW,diseaseCubeBank, outbreakManager);
-        this.testCity.infect(CityColor.YELLOW,diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
         assertEquals(22,diseaseCubeBank.remainingCubes(CityColor.YELLOW));
         this.testCity.treatDisease(CityColor.YELLOW,diseaseCubeBank);
         assertEquals(1,this.testCity.getInfectionLevel(CityColor.YELLOW));
@@ -165,9 +165,9 @@ public class CityTest {
 
     public void testMedicTreatDiseaseHelper(CityColor color){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        this.testCity.infect(color,diseaseCubeBank, outbreakManager);
-        this.testCity.infect(color,diseaseCubeBank, outbreakManager);
-        this.testCity.infect(color,diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
+        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
         assertEquals(21,diseaseCubeBank.remainingCubes(color));
         this.testCity.medicTreatDisease(color,diseaseCubeBank);
         assertEquals(0,this.testCity.getInfectionLevel(color));
