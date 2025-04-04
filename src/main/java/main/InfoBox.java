@@ -42,9 +42,37 @@ public class InfoBox {
         g.setColor(Color.WHITE);
         g.drawString(text, xPos + INFO_TEXT_X_OFFSET, yPos + INFO_TEXT_Y_OFFSET);
     }
+    /**
+     * ensures: returns xpos of infobox
+     */
+    public int getxPos() {
+        return xPos;
+    }
 
-    // Deleted methods revolved around getting and setting the position of the info box, since the box will always be
-    // in the top left these are not needed, and were unused.
+    /**
+     * ensures: sets xpos of infobox
+     * @param xpos as int
+     */
+
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
+    }
+
+    /**
+     * ensures: returns ypos of infobox
+     */
+
+    public int getyPos() {
+        return yPos;
+    }
+
+    /**
+     * ensures: sets ypos of infobox
+     * @param: ypos as int
+     */
+    public void setyPos(int yPos) {
+        this.yPos = yPos;
+    }
 
     /**
      * ensures: returns with of infobox
