@@ -12,20 +12,20 @@ public class InfectionCard {
         if (inInfectionDeck) {
             this.inInfectionDeck = false;
             if (status != DiseaseStatus.ERADICATED) {
-                this.city.infect(this.city.defaultColor(), diseaseCubeBank, outbreakManager);
+                diseaseCubeBank.infectCity(this.city, this.city.defaultColor(), outbreakManager);
             }
         }
     }
 
     public void cardDrawnDuringEpidemic(DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-        this.city.infect(this.city.defaultColor(), diseaseCubeBank, outbreakManager);
-        this.city.infect(this.city.defaultColor(), diseaseCubeBank, outbreakManager);
-        this.city.infect(this.city.defaultColor(), diseaseCubeBank, outbreakManager);
+        diseaseCubeBank.infectCity(this.city, this.city.defaultColor(), outbreakManager);
+        diseaseCubeBank.infectCity(this.city, this.city.defaultColor(), outbreakManager);
+        diseaseCubeBank.infectCity(this.city, this.city.defaultColor(), outbreakManager);
     }
 
     public void infectDuringSetup(int diseaseCubes, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
         for (int i = 0; i < diseaseCubes; i++) {
-            this.city.infect(this.city.defaultColor(), diseaseCubeBank, outbreakManager);
+            diseaseCubeBank.infectCity(this.city, this.city.defaultColor(), outbreakManager);
         }
     }
 
