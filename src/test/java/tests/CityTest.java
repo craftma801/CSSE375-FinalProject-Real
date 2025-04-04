@@ -1,6 +1,6 @@
 package tests;
 
-import main.Point;
+//import main.Point;
 import main.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class CityTest {
 
     @BeforeEach
     void setUp() {
-        this.testCity = new City("Terre Haute", new Point(40,70), CityColor.YELLOW);
+        this.testCity = new City("Terre Haute", 40,70, CityColor.YELLOW);
         this.outbreakManager = new OutbreakManager(new DummyGameWindow());
     }
 
@@ -43,7 +43,7 @@ public class CityTest {
     @Test
     public void testOutbreaksActivate(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        City atlanta = new City("Atlanta", new Point(0, 0), CityColor.BLUE);
+        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
         atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
         atlanta.infect(CityColor.BLUE, diseaseCubeBank, outbreakManager);
@@ -55,8 +55,8 @@ public class CityTest {
     @Test
     public void testOutbreaksChain(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        City taipei = new City("Taipei", new Point(0, 0), CityColor.RED);
-        City hongKong = new City("Hong Kong", new Point(0, 0), CityColor.RED);
+        City taipei = new City("Taipei", 0, 0, CityColor.RED);
+        City hongKong = new City("Hong Kong", 0, 0, CityColor.RED);
 
         taipei.addConnection(hongKong);
         hongKong.addConnection(taipei);
@@ -79,8 +79,8 @@ public class CityTest {
     @Test
     public void testOutbreaksDontChainOnSelf(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        City baghdad =new City("Baghdad", new Point(0, 0), CityColor.BLACK);
-        City istanbul = new City("Istanbul", new Point(0, 0), CityColor.BLACK);
+        City baghdad =new City("Baghdad", 0, 0, CityColor.BLACK);
+        City istanbul = new City("Istanbul", 0, 0, CityColor.BLACK);
 
         baghdad.addConnection(istanbul);
         istanbul.addConnection(baghdad);
@@ -105,7 +105,7 @@ public class CityTest {
 
     @Test
     public void testTwoCities(){
-        City secondCity = new City("San Diego", new Point(20, 100), CityColor.BLUE);
+        City secondCity = new City("San Diego", 20, 100, CityColor.BLUE);
         assertEquals("San Diego",secondCity.name);
         assertEquals(CityColor.BLUE,secondCity.defaultColor());
     }
@@ -117,7 +117,7 @@ public class CityTest {
 
     @Test
     public void hasResearchStation(){
-        City secondCity = new City("San Diego", new Point(20, 100), CityColor.BLUE);
+        City secondCity = new City("San Diego", 20, 100, CityColor.BLUE);
         secondCity.buildResearchStation();
         assertTrue(secondCity.hasResearchStation());
     }

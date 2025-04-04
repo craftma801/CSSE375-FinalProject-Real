@@ -27,8 +27,8 @@ public class Pandemic {
         boardStatusController.handleAction(playerAction);
     }
 
-    private static City createCity(String name, Point location, CityColor color) {
-        return new City(name, location, color);
+    private static City createCity(String name, int xLocation, int yLocation, CityColor color) {
+        return new City(name, xLocation, yLocation, color);
     }
 
     public static ArrayList<City> createMap() {
@@ -41,7 +41,7 @@ public class Pandemic {
     private static Map<String, City> createCities(List<CityData> cityDataList) {
         Map<String, City> cityMap = new HashMap<>();
         for (CityData data : cityDataList) {
-            City city = createCity(bundle.getString(data.name), new Point(data.x, data.y), CityColor.valueOf(data.color));
+            City city = createCity(bundle.getString(data.name), data.x, data.y, CityColor.valueOf(data.color));
             cityMap.put(data.name, city);
         }
         return cityMap;

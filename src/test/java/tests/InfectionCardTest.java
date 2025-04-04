@@ -13,7 +13,7 @@ public class InfectionCardTest{
 
 	@BeforeEach
 	public void setUp() {
-		this.testCity = new City("Atlanta", new Point(200, 400), CityColor.BLUE);
+		this.testCity = new City("Atlanta", 200, 400, CityColor.BLUE);
 		this.outbreakManager = new OutbreakManager(new DummyGameWindow());
 	}
 
@@ -28,7 +28,7 @@ public class InfectionCardTest{
 	@Test
 	public void testSetupInfect() {
 		DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-		City testCity2 = new City("Los Angeles", new Point(100, 500), CityColor.YELLOW);
+		City testCity2 = new City("Los Angeles", 100, 500, CityColor.YELLOW);
 		InfectionCard testCard1 = new InfectionCard(this.testCity);
 		InfectionCard testCard2 = new InfectionCard(testCity2);
 		testCard1.infectDuringSetup(3, diseaseCubeBank, outbreakManager);

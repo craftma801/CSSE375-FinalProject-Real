@@ -1,6 +1,6 @@
 package tests;
 
-import main.Point;
+//import main.Point;
 import main.*;
 import main.roles.*;
 import org.easymock.EasyMock;
@@ -28,15 +28,15 @@ public class BoardStatusControllerTest {
     private final int NUM_PLAYERS = 4;
 
     public void createNewBSCWithTestMap(GameWindowInterface gameWindow) {
-        chicago = new City("Chicago", new Point(315, 405), CityColor.BLUE);
-        atlanta = new City("Atlanta", new Point(380, 515), CityColor.BLUE);
-        london = new City("London", new Point(0, 0), CityColor.BLUE);
-        sanFrancisco = new City("San Francisco", new Point(105, 460), CityColor.BLUE);
-        montreal = new City("Montreal", new Point(485, 400), CityColor.BLUE);
-        washington = new City("Washington", new Point(555, 510), CityColor.BLUE);
-        newYork = new City("New York", new Point(610, 420), CityColor.BLUE);
-        madrid = new City("Madrid", new Point(890, 475), CityColor.BLUE);
-        miami = new City("Miami", new Point(485, 635), CityColor.YELLOW);
+        chicago = new City("Chicago", 315, 405, CityColor.BLUE);
+        atlanta = new City("Atlanta", 380, 515, CityColor.BLUE);
+        london = new City("London", 0, 0, CityColor.BLUE);
+        sanFrancisco = new City("San Francisco", 105, 460, CityColor.BLUE);
+        montreal = new City("Montreal", 485, 400, CityColor.BLUE);
+        washington = new City("Washington", 555, 510, CityColor.BLUE);
+        newYork = new City("New York", 610, 420, CityColor.BLUE);
+        madrid = new City("Madrid", 890, 475, CityColor.BLUE);
+        miami = new City("Miami", 485, 635, CityColor.YELLOW);
 
         chicago.addConnection(atlanta);
         chicago.addConnection(montreal);
@@ -188,7 +188,7 @@ public class BoardStatusControllerTest {
         Stack<InfectionCard> testInfectionDeck = new Stack<>();
         String[] cityNames = new String[]{"Washington", "Essen", "Delhi", "Chicago", "Baghdad", "Atlanta"};
         for (String cityName : cityNames) {
-            City currentCity = new City(cityName, new Point(0, 0), CityColor.BLUE);
+            City currentCity = new City(cityName, 0, 0, CityColor.BLUE);
             InfectionCard cardToAdd = new InfectionCard(currentCity);
             testInfectionDeck.push(cardToAdd);
         }
@@ -202,7 +202,7 @@ public class BoardStatusControllerTest {
 
         EasyMock.replay(mockedGameWindow);
 
-        Player player = new Medic(new City("Atlanta", new Point(0, 0), CityColor.BLUE));
+        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
         EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
 
         player.drawCard(forecastCard);
@@ -228,7 +228,7 @@ public class BoardStatusControllerTest {
         InfectionCard[] listOfInfectionCards = new InfectionCard[6];
         String[] cityNames = new String[]{"Atlanta", "Baghdad", "Chicago", "Delhi", "Essen", "Washington"};
         for (int i = 0; i < cityNames.length; i++) {
-            City currentCity = new City(cityNames[i], new Point(0, 0), CityColor.BLUE);
+            City currentCity = new City(cityNames[i], 0, 0, CityColor.BLUE);
             InfectionCard cardToAdd = new InfectionCard(currentCity);
             testInfectionDeck.push(cardToAdd);
             expectedInfectionDeck.push(cardToAdd);
@@ -255,7 +255,7 @@ public class BoardStatusControllerTest {
 
         EasyMock.replay(mockedGameWindow);
 
-        Player player = new Medic(new City("Atlanta", new Point(0, 0), CityColor.BLUE));
+        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
         EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
 
         player.drawCard(forecastCard);
@@ -281,7 +281,7 @@ public class BoardStatusControllerTest {
         InfectionCard[] listOfInfectionCards = new InfectionCard[5];
 
         for (int i = 0; i < testCityNames.length; i++) {
-            City currentTestCity = new City(testCityNames[i], new Point(0, 0), CityColor.BLUE);
+            City currentTestCity = new City(testCityNames[i], 0, 0, CityColor.BLUE);
             InfectionCard cardToAdd = new InfectionCard(currentTestCity);
             testInfectionDeck.push(cardToAdd);
             listOfInfectionCards[i] = cardToAdd;
@@ -306,7 +306,7 @@ public class BoardStatusControllerTest {
 
         EasyMock.replay(mockedGameWindow);
 
-        Player player = new Medic(new City("Atlanta", new Point(0, 0), CityColor.BLUE));
+        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
         EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
 
         player.drawCard(forecastCard);
@@ -525,8 +525,8 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.infectionDeck = new Stack<>();
-        Point blackPoint = new Point(0,0);
-        City blackCity = new City("BlackCity",blackPoint,CityColor.BLACK);
+//        Point blackPoint = new Point(0,0);
+        City blackCity = new City("BlackCity",0, 0,CityColor.BLACK);
         bsc.infectionDeck.push(new InfectionCard(blackCity));
         bsc.initializePlayers();
         bsc.playerDeck = new Stack<>();
@@ -1049,8 +1049,8 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.infectionDeck = new Stack<>();
-        Point redPoint = new Point(0,0);
-        City redCity = new City("RedCity",redPoint,CityColor.RED);
+//        Point redPoint = new Point(0,0);
+        City redCity = new City("RedCity", 0, 0,CityColor.RED);
         bsc.infectionDeck.push(new InfectionCard(miami));
         bsc.infectionDeck.push(new InfectionCard(atlanta));
         bsc.infectionDeck.push(new InfectionCard(redCity));

@@ -28,9 +28,9 @@ public class CitySteps {
     public void given_a_city(String name, String color) {
         diseaseCubeBank = new DiseaseCubeBank();
         outbreakManager = new OutbreakManager(new DummyGameWindow());
-        Point cityLocation = new Point(0, 0);
+//        Point cityLocation = new Point(0, 0);
         CityColor cityColor = stringToEnum(color);
-        testCity = new City(name, cityLocation, cityColor);
+        testCity = new City(name, 0, 0, cityColor);
     }
 
     @Given("A research station on the city")
@@ -62,9 +62,9 @@ public class CitySteps {
 
     @And("a second city {string} with color {string}")
     public void aSecondCityWithColor(String name, String color) {
-        Point cityLocation = new Point(0, 0);
+//        Point cityLocation = new Point(0, 0);
         CityColor cityColor = stringToEnum(color);
-        testCity2 = new City(name, cityLocation, cityColor);
+        testCity2 = new City(name, 0, 0, cityColor);
     }
 
     @When("an attempt is made to infect the city")

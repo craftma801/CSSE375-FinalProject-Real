@@ -143,6 +143,11 @@ public class Player {
                 this.cardsInHand.add(cardToTake);
                 return;
             }
+
+            String knowledgeShareFailed = bundle.getString("failedToTakeKnowledge");
+            // left in temporarily until below is implemented
+            throw new ActionFailedException(knowledgeShareFailed);
+
             // This is so action failed does not show up when canceling or not on the same space as takingFrom player
             // still needs working, and questions to ask.
 //            else{

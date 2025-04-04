@@ -1,7 +1,8 @@
 package main;
 
 
-// TODO dataclass refactor (Aron)
+// DONE dataclass refactor (Aron)
+// Class is now depreciated and can be deleted
 public class Point {
     private final int x;
     private final int y;

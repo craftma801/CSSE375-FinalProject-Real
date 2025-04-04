@@ -20,7 +20,10 @@ public class City {
     private static final int CITY_RADIUS = 38;
 
     public final String name;
-    public final Point location;
+    public final int x;
+    public final int y;
+    private double xScale;
+    private double yScale;
 
     public final CityColor color;
 
@@ -32,9 +35,10 @@ public class City {
     private boolean hasResearchStation;
     public boolean outbreakIsHappening;
 
-    public City(String cityName, Point cityLocation, CityColor color) {
+    public City(String cityName, int x, int y, CityColor color) {
         this.name = cityName;
-        this.location = cityLocation;
+        this.x = x;
+        this.y = y;
         this.color = color;
         this.players = new ArrayList<>();
         diseaseLevels = new HashMap<>();
@@ -137,7 +141,8 @@ public class City {
     }
 
     public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale, boolean enabled) {
-        location.setScale(xScale, yScale);
+        this.xScale = xScale;
+        this.yScale = yScale;
         int scaledRadius = (int) (CITY_RADIUS * xScale);
         Color drawColor = switch (this.color) {
             case YELLOW -> new Color(209, 187, 88);
@@ -150,7 +155,7 @@ public class City {
         } else {
             graphics2D.setColor(drawColor.darker().darker());
         }
-        graphics2D.fillOval(location.getX() - scaledRadius, location.getY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
+        graphics2D.fillOval(this.x - scaledRadius, this.y - scaledRadius, 2*scaledRadius, 2*scaledRadius);
 
         if (hasResearchStation()) {
             drawResearchStation(graphics2D, getTotalNumCubes());
@@ -164,8 +169,8 @@ public class City {
     private void drawPawns(Graphics2D graphics2D, JComponent observer) {
         int numPawns = players.size();
         int pawnBlockSize = numPawns * PAWN_WIDTH + (numPawns - 1) * PAWN_GAP;
-        int pawnBlockX = location.getX() - (pawnBlockSize) / 2;
-        int pawnBlockY = location.getY() - PAWN_HEIGHT;
+        int pawnBlockX = this.x - (pawnBlockSize) / 2;
+        int pawnBlockY = this.y - PAWN_HEIGHT;
 
         FontMetrics fm = graphics2D.getFontMetrics();
         graphics2D.setFont(new Font("Indicator", Font.BOLD, 12));
@@ -191,8 +196,8 @@ public class City {
         int xOffset = hasResearchStation() ? -CUBE_GAP : CUBE_SIZE + (CUBE_GAP / 2);
         int yOffset = this.players.isEmpty() ? -10 : 5;
 
-        int gridX = this.location.getX() + xOffset;
-        int gridY = this.location.getY() + yOffset;
+        int gridX = this.x + xOffset;
+        int gridY = this.y + yOffset;
 
         Color cubeColor;
         int yellowRemaining = diseaseLevels.get(Color.YELLOW);
@@ -227,8 +232,8 @@ public class City {
         int xOffset = totalCubes > 0 ? 0 : -(RESEARCH_STATION_WIDTH / 2);
         int yOffset = players.isEmpty() ? 10 : 25;
 
-        int stationX = location.getX() + xOffset;
-        int stationY = location.getY() + yOffset;
+        int stationX = this.x + xOffset;
+        int stationY = this.y + yOffset;
 
         int baseRectHeight = (int) (RESEARCH_STATION_HEIGHT * 0.6);
         int baseRectY = stationY - baseRectHeight;
@@ -246,6 +251,13 @@ public class City {
     }
 
     public boolean isClicked(int x, int y) {
-        return location.getScaledDistance(x, y) < 25;
+        return getScaledDistance(x, y) < 25;
     }
+
+    public double getScaledDistance(int destX, int destY) {
+        double xDist = Math.abs(destX - this.x) * xScale;
+        double yDist = Math.abs(destY - this.y) * yScale;
+        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+    }
+
 }

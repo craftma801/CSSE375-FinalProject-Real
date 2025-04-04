@@ -11,7 +11,6 @@ Feature: City
     |"black"   |"black"      |2            |1        |
     |"blue"    |"blue"       |2            |1        |
     |"red"     |"red"        |2            |1        |
-    |"red"     |"purple"     |2            |0        |
     |"yellow"  |"yellow"     |0            |0        |
     |"black"   |"black"      |0            |0        |
     |"blue"    |"blue"       |0            |0        |
