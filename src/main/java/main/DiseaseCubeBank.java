@@ -32,38 +32,4 @@ public class DiseaseCubeBank {
         validateColor(cityColor);
         cubeBanks.put(cityColor, cubeBanks.get(cityColor) + 1);
     }
-
-    public void infectCity(City city, CityColor color, OutbreakManager outbreakManager) {
-        if(city.quarantineSpecialistNearby()){
-            return;
-        }
-
-        int currentLevel = city.getInfectionLevel(color);
-        if(currentLevel >= 3){
-            city.outbreak(color, this, outbreakManager);
-        }
-        else {
-            city.addCube(color);
-            cityInfected(color);
-        }
-    }
-
-    public boolean treatDiseaseAt(City city, CityColor color, boolean isMedic) {
-        int diseaseAmount = city.getInfectionLevel(color);
-        if(diseaseAmount > 0){
-            if(isMedic){
-                city.removeAllCubes(color);
-                for(int i = 0; i < diseaseAmount; i++){
-                    colorTreated(color);
-                }
-            }
-            else{
-                city.removeCube(color);
-                colorTreated(color);
-            }
-            return true;
-        }
-        return false;
-    }
-
 }

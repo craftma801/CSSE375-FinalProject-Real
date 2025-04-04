@@ -52,51 +52,35 @@ public class City {
     }
 
     public int getInfectionLevel(CityColor color) {
-        return diseaseLevels.getOrDefault(color, 0);
+        return diseaseLevels.get(color);
     }
 
     public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank) {
-        return diseaseCubeBank.treatDiseaseAt(this, infectionColor, false);
+        return this.treatDisease(infectionColor, diseaseCubeBank, false);
     }
 
     public boolean medicTreatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank) {
-        return diseaseCubeBank.treatDiseaseAt(this, infectionColor, true);
+        return this.treatDisease(infectionColor, diseaseCubeBank, true);
     }
 
     // treatDisease will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
     // disease cube bank.
-//    public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
-//        int diseaseAmount = diseaseLevels.get(infectionColor);
-//        if (diseaseAmount > 0) {
-//            if (isMedic) {
-//                diseaseLevels.put(infectionColor, 0);
-//                for (int i = diseaseAmount; i > 0; i--) {
-//                    diseaseCubeBank.colorTreated(infectionColor);
-//                }
-//                return true;
-//            } else {
-//                diseaseLevels.put(infectionColor, diseaseAmount - 1);
-//                diseaseCubeBank.colorTreated(infectionColor);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-
-    public void addCube(CityColor color){
-        diseaseLevels.put(color, getInfectionLevel(color) + 1);
-    }
-
-    public void removeCube(CityColor color){
-        int current = getInfectionLevel(color);
-        if(current > 0){
-            diseaseLevels.put(color, current-1);
+    public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
+        int diseaseAmount = diseaseLevels.get(infectionColor);
+        if (diseaseAmount > 0) {
+            if (isMedic) {
+                diseaseLevels.put(infectionColor, 0);
+                for (int i = diseaseAmount; i > 0; i--) {
+                    diseaseCubeBank.colorTreated(infectionColor);
+                }
+                return true;
+            } else {
+                diseaseLevels.put(infectionColor, diseaseAmount - 1);
+                diseaseCubeBank.colorTreated(infectionColor);
+                return true;
+            }
         }
-    }
-
-    public void removeAllCubes(CityColor color){
-        diseaseLevels.put(color, 0);
+        return false;
     }
 
     private boolean hasQuarantineSpecialist() {
@@ -106,7 +90,7 @@ public class City {
         return false;
     }
 
-    public boolean quarantineSpecialistNearby() {
+    private boolean quarantineSpecialistNearby() {
         for(City city : connectedCities)
             if(city.hasQuarantineSpecialist())
                 return true;
@@ -115,22 +99,22 @@ public class City {
 
     // Infect will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
     // disease cube bank.
-//    public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-//        if (quarantineSpecialistNearby())
-//            return;
-//        if (diseaseLevels.get(infectionColor) >= 3) {
-//            outbreak(infectionColor, diseaseCubeBank, outbreakManager);
-//        } else {
-//            diseaseLevels.put(infectionColor, diseaseLevels.get(infectionColor) + 1);
-//            diseaseCubeBank.cityInfected(infectionColor);
-//        }
-//    }
+    public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
+        if (quarantineSpecialistNearby())
+            return;
+        if (diseaseLevels.get(infectionColor) >= 3) {
+            outbreak(infectionColor, diseaseCubeBank, outbreakManager);
+        } else {
+            diseaseLevels.put(infectionColor, diseaseLevels.get(infectionColor) + 1);
+            diseaseCubeBank.cityInfected(infectionColor);
+        }
+    }
 
     public void outbreak(CityColor diseaseColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
         if (!this.outbreakIsHappening) {
             this.outbreakIsHappening = true;
             for (City toInfect : this.connectedCities) {
-                diseaseCubeBank.infectCity(toInfect, diseaseColor, outbreakManager);
+                toInfect.infect(diseaseColor, diseaseCubeBank, outbreakManager);
             }
             outbreakManager.incrementOutbreaks();
         }

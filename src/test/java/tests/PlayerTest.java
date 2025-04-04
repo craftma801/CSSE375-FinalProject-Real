@@ -83,8 +83,8 @@ public class PlayerTest {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         OutbreakManager outbreakManager = new OutbreakManager(new DummyGameWindow());
         City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
+        testCity.infect(CityColor.YELLOW, diseaseCubeBank, outbreakManager);
+        testCity.infect(CityColor.YELLOW, diseaseCubeBank, outbreakManager);
 
         Player testPlayer = new Researcher(testCity);
         testPlayer.treatDisease(CityColor.YELLOW, diseaseCubeBank);
@@ -97,8 +97,8 @@ public class PlayerTest {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         OutbreakManager outbreakManager = new OutbreakManager(new DummyGameWindow());
         City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
+        testCity.infect(CityColor.YELLOW, diseaseCubeBank, outbreakManager);
+        testCity.infect(CityColor.YELLOW, diseaseCubeBank, outbreakManager);
 
         Player testPlayer = new Medic(testCity);
         testPlayer.treatDisease(CityColor.YELLOW, diseaseCubeBank);

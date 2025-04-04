@@ -651,7 +651,7 @@ public class BoardStatusControllerTest {
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
+        atlanta.infect(CityColor.YELLOW, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
@@ -671,7 +671,7 @@ public class BoardStatusControllerTest {
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.BLUE, om);
+        atlanta.infect(CityColor.BLUE, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
@@ -691,7 +691,7 @@ public class BoardStatusControllerTest {
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.RED,om);
+        atlanta.infect(CityColor.RED, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.RED));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
@@ -711,7 +711,7 @@ public class BoardStatusControllerTest {
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.BLACK,om);
+        atlanta.infect(CityColor.BLACK, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLACK));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
@@ -1033,8 +1033,8 @@ public class BoardStatusControllerTest {
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
+        atlanta.infect(CityColor.YELLOW, dcb,om);
+        atlanta.infect(CityColor.YELLOW, dcb,om);
         bsc.cureDisease(CityColor.YELLOW);
         assertEquals(2,atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
