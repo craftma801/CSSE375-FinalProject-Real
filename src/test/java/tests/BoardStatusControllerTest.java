@@ -669,7 +669,7 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initializePlayers();
+        bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
         atlanta.infect(CityColor.BLUE, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
