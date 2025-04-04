@@ -63,6 +63,8 @@ public class City {
         return this.treatDisease(infectionColor, diseaseCubeBank, true);
     }
 
+    // treatDisease will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
+    // disease cube bank.
     public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
         int diseaseAmount = diseaseLevels.get(infectionColor);
         if (diseaseAmount > 0) {
@@ -95,6 +97,8 @@ public class City {
         return this.hasQuarantineSpecialist();
     }
 
+    // Infect will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
+    // disease cube bank.
     public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
         if (quarantineSpecialistNearby())
             return;
