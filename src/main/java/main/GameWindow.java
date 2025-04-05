@@ -36,7 +36,7 @@ public class GameWindow implements GameWindowInterface {
 
         this.gameBoard = new GameBoard(cities);
         this.gamePanel.add(gameBoard, BorderLayout.CENTER);
-        this.gameBoard.setPreferredSize(Pandemic.BOARD_SIZE);
+        this.gameBoard.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH, Pandemic.BOARD_HEIGHT));
 
         this.actionsPanel = new ActionsPanel();
         this.gamePanel.add(this.actionsPanel, BorderLayout.EAST);

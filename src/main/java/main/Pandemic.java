@@ -2,7 +2,6 @@ package main;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -11,7 +10,6 @@ import java.util.List;
 public class Pandemic {
     public static final int BOARD_WIDTH = 2200;
     public static final int BOARD_HEIGHT = 1400;
-    public static final Dimension BOARD_SIZE = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
     private static BoardStatusController boardStatusController;
     public static ResourceBundle bundle;
 
