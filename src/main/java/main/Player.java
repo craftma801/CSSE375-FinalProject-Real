@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import java.awt.image.RGBImageFilter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
@@ -35,7 +36,13 @@ public class Player {
 
     private void generateIcon() {
         Image pawnImage = Toolkit.getDefaultToolkit().getImage("assets/pawn.png");
-        ImageFilter colorFilter = new PawnImageFilter(color);
+//        ImageFilter colorFilter = new PawnImageFilter(color);
+        ImageFilter colorFilter = new RGBImageFilter() {
+            @Override
+            public int filterRGB(int x, int y, int rgb) {
+                return (rgb > 0) ? 0x00000000 : color.getRGB();
+            }
+        };
         FilteredImageSource filteredSrc = new FilteredImageSource(pawnImage.getSource(), colorFilter);
         this.icon = Toolkit.getDefaultToolkit().createImage(filteredSrc);
     }

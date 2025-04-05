@@ -3,6 +3,7 @@ package main;
 import java.awt.*;
 import java.awt.image.RGBImageFilter;
 
+// Safe to remove entirely
 public class PawnImageFilter extends RGBImageFilter {
     private final Color color;
 
