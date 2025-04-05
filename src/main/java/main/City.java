@@ -175,7 +175,7 @@ public class City {
         } else {
             graphics2D.setColor(drawColor.darker().darker());
         }
-        graphics2D.fillOval(this.x - scaledRadius, this.y - scaledRadius, 2*scaledRadius, 2*scaledRadius);
+        graphics2D.fillOval(getScaledX() - scaledRadius, getScaledY() - scaledRadius, 2*scaledRadius, 2*scaledRadius);
 
         if (hasResearchStation()) {
             drawResearchStation(graphics2D, getTotalNumCubes());
