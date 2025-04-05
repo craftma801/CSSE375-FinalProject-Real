@@ -780,11 +780,7 @@ public class BoardStatusControllerTest {
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
 
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(),anyObject())).andReturn(null);
-        EasyMock.replay(gw);
-
-
-        assertThrows(ActionFailedException.class,bsc::handleTakeKnowledge);
+        assertFalse(bsc.handleTakeKnowledge());
     }
 
     @Test
