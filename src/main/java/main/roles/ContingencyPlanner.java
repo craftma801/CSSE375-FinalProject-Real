@@ -29,8 +29,8 @@ public class ContingencyPlanner extends Player {
             return false;
         }
         try{
-            EventName cardNameToTake = EventName.valueOf(bsc.gameWindow.promptSelectOption(eventCardsInDiscardPile.toArray(new String[0]),
-                    "Select a card", "Take an event card from the discard pile"));
+            EventName cardNameToTake = EventName.valueOf(bsc.gameWindow.promptSelectOption(new PromptWindowInputs(eventCardsInDiscardPile.toArray(new String[0]),
+                    "Select a card", "Take an event card from the discard pile")));
             EventCard cardToTake = getCardToTake(discardPile, cardNameToTake);
             this.isHoldingEventCard = true;
             this.heldEventCard = cardToTake;
