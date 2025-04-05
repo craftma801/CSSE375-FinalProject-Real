@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+// Safe to remove entirely
 public class WorldMapLoader {
 
     public static List<CityData> loadCityData() {
