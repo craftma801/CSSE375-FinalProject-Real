@@ -189,8 +189,8 @@ public class City {
     private void drawPawns(Graphics2D graphics2D, JComponent observer) {
         int numPawns = players.size();
         int pawnBlockSize = numPawns * PAWN_WIDTH + (numPawns - 1) * PAWN_GAP;
-        int pawnBlockX = this.x - (pawnBlockSize) / 2;
-        int pawnBlockY = this.y - PAWN_HEIGHT;
+        int pawnBlockX = getScaledX() - (pawnBlockSize) / 2;
+        int pawnBlockY = getScaledY() - PAWN_HEIGHT;
 
         FontMetrics fm = graphics2D.getFontMetrics();
         graphics2D.setFont(new Font("Indicator", Font.BOLD, 12));
@@ -216,8 +216,8 @@ public class City {
         int xOffset = hasResearchStation() ? -CUBE_GAP : CUBE_SIZE + (CUBE_GAP / 2);
         int yOffset = this.players.isEmpty() ? -10 : 5;
 
-        int gridX = this.x + xOffset;
-        int gridY = this.y + yOffset;
+        int gridX = getScaledX() + xOffset;
+        int gridY = getScaledY() + yOffset;
 
         Color cubeColor;
         int yellowRemaining = diseaseLevels.get(CityColor.YELLOW);
@@ -252,8 +252,8 @@ public class City {
         int xOffset = totalCubes > 0 ? 0 : -(RESEARCH_STATION_WIDTH / 2);
         int yOffset = players.isEmpty() ? 10 : 25;
 
-        int stationX = this.x + xOffset;
-        int stationY = this.y + yOffset;
+        int stationX = getScaledX() + xOffset;
+        int stationY = getScaledY() + yOffset;
 
         int baseRectHeight = (int) (RESEARCH_STATION_HEIGHT * 0.6);
         int baseRectY = stationY - baseRectHeight;
