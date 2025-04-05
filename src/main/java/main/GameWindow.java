@@ -260,7 +260,7 @@ public class GameWindow implements GameWindowInterface {
         dialog.setVisible(true);
     }
 
-    public static Locale selectLocale(String message){
+    public static Locale selectLocale(){
         JFrame promptFrame = new JFrame();
         ArrayList<Locale> locales = new ArrayList<>();
         Scanner scanner;
@@ -279,27 +279,23 @@ public class GameWindow implements GameWindowInterface {
         }
         scanner.close();
 
-        Locale localeToReturn = (Locale) JOptionPane.showInputDialog(
+        return (Locale) JOptionPane.showInputDialog(
                 promptFrame,
-                message,
-                null,
+                "Please select your locale",
+                "Select Locale",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 locales.toArray(),
                 null);
-        if (localeToReturn != null) {
-            return localeToReturn;
-        }
-        return new Locale("en", "US");
     }
 
     public static String selectNumberOfPlayers() {
         JFrame promptFrame = new JFrame();
-        String[] options = new String[]{"2", "3", "4"};
+        String[] options = new String[] {"2", "3", "4"};
         return (String) JOptionPane.showInputDialog(
                 promptFrame,
-                "Please Choose Number of Players",
-                "Choose number of players",
+                "Please choose number of players",
+                "Choose Number of Players",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 options,

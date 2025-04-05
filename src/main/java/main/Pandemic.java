@@ -14,14 +14,27 @@ public class Pandemic {
     public static final Dimension BOARD_SIZE = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
     private static BoardStatusController boardStatusController;
     public static ResourceBundle bundle;
-    public static Locale locale;
 
     public static void main(String[] args) {
-        locale = GameWindow.selectLocale("Select your Locale");
-        bundle = ResourceBundle.getBundle("messages", locale);
-        int numPlayers = Integer.parseInt(GameWindow.selectNumberOfPlayers());
+        Locale locale = GameWindow.selectLocale();
+        if (locale == null) {
+            System.exit(0);
+            return;
+        } else {
+             bundle = ResourceBundle.getBundle("messages", locale);
+        }
+
+        String numPlayersString = GameWindow.selectNumberOfPlayers();
+        int numPlayers;
+        if (numPlayersString == null) {
+            System.exit(0);
+            return;
+        } else {
+            numPlayers = Integer.parseInt(numPlayersString);
+        }
+
         ArrayList<City> cityMap = createMap();
-               boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap, numPlayers);
+        boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap, numPlayers);
         boardStatusController.setup();
         boardStatusController.startGame();
         boardStatusController.displayGame();
