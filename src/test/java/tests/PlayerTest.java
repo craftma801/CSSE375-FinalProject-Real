@@ -291,7 +291,7 @@ public class PlayerTest {
     @Test
     public void testDrawCardWhenHandFull() {
         mockedGameWindow = EasyMock.createMock(GameWindow.class);
-        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Atlanta");
+        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Atlanta");
         EasyMock.replay(mockedGameWindow);
 
         setupBSC(mockedGameWindow);
@@ -378,9 +378,9 @@ public class PlayerTest {
         bsc.playerDiscardPile.add(oneQuietNightCard);
         bsc.playerDiscardPile.add(airliftCard);
 
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject()))
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject()))
                 .andReturn("");
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject()))
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject()))
                 .andReturn("ONE_QUIET_NIGHT");
         EasyMock.replay(gameWindow);
 
@@ -437,8 +437,8 @@ public class PlayerTest {
         PlayerCard playerCard = new PlayerCard(atlanta);
         EventCard oneQuietNight = new EventCard(EventName.ONE_QUIET_NIGHT, bsc);
 
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Play an Event Card");
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("ONE_QUIET_NIGHT");
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject())).andReturn("Play an Event Card");
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject())).andReturn("ONE_QUIET_NIGHT");
         EasyMock.replay(gameWindow);
 
         player.drawCard(oneQuietNight);
@@ -472,8 +472,8 @@ public class PlayerTest {
         PlayerCard chicagoCard = new PlayerCard(chicago);
         EventCard oneQuietNight = new EventCard(EventName.ONE_QUIET_NIGHT, bsc);
 
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Discard a Card");
-        EasyMock.expect(gameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Atlanta");
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject())).andReturn("Discard a Card");
+        EasyMock.expect(gameWindow.promptSelectOption(anyObject())).andReturn("Atlanta");
         EasyMock.replay(gameWindow);
 
         player.drawCard(oneQuietNight);
