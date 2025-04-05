@@ -280,4 +280,12 @@ public class City {
         return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
     }
 
+    public int getScaledX() {
+        return (int) (this.x * xScale);
+    }
+
+    public int getScaledY() {
+        return (int) (this.y * yScale);
+    }
+
 }
