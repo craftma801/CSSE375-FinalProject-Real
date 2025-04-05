@@ -293,16 +293,29 @@ public class GameWindow implements GameWindowInterface {
         return new Locale("en", "US");
     }
 
-    public static String selectNumberOfPlayers() {
+    public static String selectSetupOption(String[] options, String message, String title) {
         JFrame promptFrame = new JFrame();
-        String[] options = new String[]{"2", "3", "4"};
         return (String) JOptionPane.showInputDialog(
                 promptFrame,
-                "Please Choose Number of Players",
-                "Choose number of players",
+                message,
+                title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 options,
                 null);
+    }
+
+    public static int calculateNumEpidemicCards(int numPlayers) {
+        String[] options = new String[]{"Introductory", "Standard", "Heroic"};
+        String message = "Please select difficulty level";
+        String title = "Select Difficulty Level";
+        String difficulty = selectSetupOption(options, message, title);
+        System.out.println(difficulty);
+        return switch (difficulty) {
+            case "Introductory" -> 4;
+            case "Standard" -> 5;
+            case "Heroic" -> 6;
+            default -> throw new RuntimeException("Invalid Difficulty Level");
+        };
     }
 }

@@ -31,12 +31,12 @@ public class BoardStatusController {
     public GameWindowInterface gameWindow;
     public boolean isQuietNight;
     private boolean gameOver;
-
+    private int numEpidemicCards;
     public OutbreakManager outbreakManager;
 
     private final ResourceBundle bundle;
 
-    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers) {
+    public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers, int numEpidemicCards) {
         if (Pandemic.bundle != null) {
             this.bundle = Pandemic.bundle;
         } else {
@@ -46,6 +46,8 @@ public class BoardStatusController {
 
         this.numPlayers = numPlayers;
         this.players = new Player[numPlayers];
+
+        this.numEpidemicCards = numEpidemicCards;
 
         this.infectionRateValues = new int[]{2, 2, 2, 3, 3, 4, 4};
         this.infectionRateIndex = 0;
@@ -459,16 +461,17 @@ public class BoardStatusController {
     }
 
     private void shuffleEpidemicCardsIntoPlayerDeck() {
-        for(int j = 0; j < numPlayers; j++) {
-            Stack<PlayerCard> playerDeck1 = new Stack<>();
-            for (int i = 0; i < 10; i++) {
-                playerDeck1.push(playerDeck.pop());
+        for(int j = 0; j < numEpidemicCards; j++) {
+            Stack<PlayerCard> singleCardDeck = new Stack<>();
+            int numCardsPerStack = 48 / (numPlayers * (6 - numPlayers));
+            for (int i = 0; i < numCardsPerStack; i++) {
+                singleCardDeck.push(playerDeck.pop());
             }
-            PlayerCard epidemicCard1 = new PlayerCard(true);
-            playerDeck1.push(epidemicCard1);
-            Collections.shuffle(playerDeck1);
-            for (int i = 0; i < 11; i++) {
-                playerDeck.push(playerDeck1.pop());
+            PlayerCard epidemicCard = new PlayerCard(true);
+            singleCardDeck.push(epidemicCard);
+            Collections.shuffle(singleCardDeck);
+            for (int i = 0; i < numCardsPerStack + 1; i++) {
+                playerDeck.push(singleCardDeck.pop());
             }
         }
     }

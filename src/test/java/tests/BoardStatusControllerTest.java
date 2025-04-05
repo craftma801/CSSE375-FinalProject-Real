@@ -26,6 +26,7 @@ public class BoardStatusControllerTest {
     private City miami;
 
     private final int NUM_PLAYERS = 4;
+    private final int NUM_EPIDEMIC_CARDS = 4;
 
     public void createNewBSCWithTestMap(GameWindowInterface gameWindow) {
         chicago = new City("Chicago", 315, 405, CityColor.BLUE);
@@ -56,7 +57,7 @@ public class BoardStatusControllerTest {
         basicMap.add(madrid);
         basicMap.add(miami);
 
-        this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS);
+        this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
     }
 
     public CompletableFuture<City> generateTestFuture(City city) {
@@ -93,7 +94,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testInitializeInfectionDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS);
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
         assertEquals(0, this.bsc.infectionDeckSize());
         this.bsc.setup();
         assertEquals(48, this.bsc.infectionDeckSize());
@@ -103,7 +104,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testInfectionDeckAfterGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS);
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
         this.bsc.setup();
         this.bsc.startGame();
         assertEquals(39, this.bsc.infectionDeckSize());
@@ -473,7 +474,7 @@ public class BoardStatusControllerTest {
     public void testEventCardsAddedToPlayerDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
         ArrayList<City> cityMap = Pandemic.createMap();
-        this.bsc = new BoardStatusController(new DummyGameWindow(), cityMap, NUM_PLAYERS);
+        this.bsc = new BoardStatusController(new DummyGameWindow(), cityMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
 
         this.bsc.setup();
         assertEquals(48, this.bsc.playerDeckSize());
@@ -494,7 +495,7 @@ public class BoardStatusControllerTest {
     public void testPlayEventCard() {
         ArrayList<City> cityMap = Pandemic.createMap();
         GameWindow mockedGameWindow = EasyMock.createMock(GameWindow.class);
-        this.bsc = new BoardStatusController(mockedGameWindow, cityMap, NUM_PLAYERS);
+        this.bsc = new BoardStatusController(mockedGameWindow, cityMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
 
         Medic medic = new Medic(atlanta);
         this.bsc.players = new Player[]{medic};
@@ -551,7 +552,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testEpidemicAndEventCardsShuffledInAtGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS);
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
         bsc.setup();
         bsc.startGame();
         assertEquals(49, bsc.playerDeckSize());
@@ -980,7 +981,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testDisplayGame() {
         GameWindowInterface gw = EasyMock.strictMock(GameWindowInterface.class);
-        bsc = new BoardStatusController(gw,Pandemic.createMap(), NUM_PLAYERS);
+        bsc = new BoardStatusController(gw,Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
         gw.showWindow();
         EasyMock.expectLastCall();
         EasyMock.replay(gw);

@@ -28,6 +28,9 @@ public class PlayerTest {
     private City madrid;
     private City miami;
 
+    private final int NUM_PLAYERS = 4;
+    private final int NUM_EPIDEMIC_CARDS = 4;
+
     private void setupBSC(GameWindowInterface gameWindow) {
         chicago = new City("Chicago", 315, 405, CityColor.BLUE);
         atlanta = new City("Atlanta", 380, 515, CityColor.BLUE);
@@ -58,7 +61,7 @@ public class PlayerTest {
         basicMap.add(madrid);
         basicMap.add(miami);
 
-        this.bsc = new BoardStatusController(gameWindow, basicMap, 4);
+        this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
     }
 
     @Test
@@ -71,7 +74,7 @@ public class PlayerTest {
     @Test
     public void testPlayerNames() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), 4);
+        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
         City testCity = new City("Test Towers", 2, 12, CityColor.YELLOW);
         Player player = new Researcher(testCity);
         player.name = bsc.generatePlayerName(1,player);
