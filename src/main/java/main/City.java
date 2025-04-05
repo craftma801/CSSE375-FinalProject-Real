@@ -220,9 +220,9 @@ public class City {
         int gridY = this.y + yOffset;
 
         Color cubeColor;
-        int yellowRemaining = diseaseLevels.get(Color.YELLOW);
-        int redRemaining = diseaseLevels.get(Color.RED);
-        int blueRemaining = diseaseLevels.get(Color.BLUE);
+        int yellowRemaining = diseaseLevels.get(CityColor.YELLOW);
+        int redRemaining = diseaseLevels.get(CityColor.RED);
+        int blueRemaining = diseaseLevels.get(CityColor.BLUE);
         for (int i = 0; i < totalCubes; i++) {
             if (yellowRemaining > 0) {
                 cubeColor = Color.YELLOW;
