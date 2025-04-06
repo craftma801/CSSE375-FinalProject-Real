@@ -63,27 +63,6 @@ public class City {
         return diseaseCubeBank.treatDiseaseAt(this, infectionColor, true);
     }
 
-    // treatDisease will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
-    // disease cube bank.
-//    public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
-//        int diseaseAmount = diseaseLevels.get(infectionColor);
-//        if (diseaseAmount > 0) {
-//            if (isMedic) {
-//                diseaseLevels.put(infectionColor, 0);
-//                for (int i = diseaseAmount; i > 0; i--) {
-//                    diseaseCubeBank.colorTreated(infectionColor);
-//                }
-//                return true;
-//            } else {
-//                diseaseLevels.put(infectionColor, diseaseAmount - 1);
-//                diseaseCubeBank.colorTreated(infectionColor);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-
     public void addCube(CityColor color){
         diseaseLevels.put(color, getInfectionLevel(color) + 1);
     }
@@ -112,19 +91,6 @@ public class City {
                 return true;
         return this.hasQuarantineSpecialist();
     }
-
-    // Infect will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
-    // disease cube bank.
-//    public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
-//        if (quarantineSpecialistNearby())
-//            return;
-//        if (diseaseLevels.get(infectionColor) >= 3) {
-//            outbreak(infectionColor, diseaseCubeBank, outbreakManager);
-//        } else {
-//            diseaseLevels.put(infectionColor, diseaseLevels.get(infectionColor) + 1);
-//            diseaseCubeBank.cityInfected(infectionColor);
-//        }
-//    }
 
     public void outbreak(CityColor diseaseColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
         if (!this.outbreakIsHappening) {
