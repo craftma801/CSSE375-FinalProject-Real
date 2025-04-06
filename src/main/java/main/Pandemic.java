@@ -15,9 +15,14 @@ public class Pandemic {
     public static void main(String[] args) {
         locale = GameWindow.selectLocale("Select your Locale");
         bundle = ResourceBundle.getBundle("messages", locale);
-        int numPlayers = Integer.parseInt(GameWindow.selectNumberOfPlayers());
+        String[] options = new String[]{"2", "3", "4"};
+        String message = "Please choose number of players";
+        String title = "Choose Number of Players";
+        int numPlayers = Integer.parseInt(GameWindow.selectSetupOption(options, message, title));
+        int numEpidemicCards = GameWindow.calculateNumEpidemicCards(numPlayers);
+        System.out.println("Number of Epidemic Cards: " + numEpidemicCards);
         ArrayList<City> cityMap = createMap();
-               boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap, numPlayers);
+               boardStatusController = new BoardStatusController(new GameWindow(cityMap), cityMap, numPlayers, numEpidemicCards);
         boardStatusController.setup();
         boardStatusController.startGame();
         boardStatusController.displayGame();
