@@ -35,6 +35,7 @@ public class BoardStatusController {
     public OutbreakManager outbreakManager;
 
     private final ResourceBundle bundle;
+    private final EventCardManager eventCardManager;
 
     public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers, int numEpidemicCards) {
         if (Pandemic.bundle != null) {
@@ -43,6 +44,8 @@ public class BoardStatusController {
             Locale locale = new Locale("en", "US");
             this.bundle = ResourceBundle.getBundle("messages", locale);
         }
+
+        this.eventCardManager = new EventCardManager(gameWindow, this.bundle);
 
         this.numPlayers = numPlayers;
         this.players = new Player[numPlayers];
@@ -89,7 +92,7 @@ public class BoardStatusController {
                 case CHARTER_FLIGHT -> handleCharterFlight();
                 case SHUTTLE_FLIGHT -> handleShuttleFlight();
                 case VIEW_CARDS -> handleViewCards(players[currentPlayerTurn]);
-                case PLAY_EVENT_CARD -> handlePlayEventCard();
+                case PLAY_EVENT_CARD -> eventCardManager.handlePlayEventCard(players[currentPlayerTurn]);
                 case ROLE_ACTION -> handleRoleAction(players[currentPlayerTurn]);
                 case SKIP_ACTION -> true;
             };
@@ -237,7 +240,7 @@ public class BoardStatusController {
         infectNineCities();
         initializePlayers();
         shuffleEpidemicCardsIntoPlayerDeck();
-        shuffleEventCardsIntoPlayerDeck();
+        eventCardManager.shuffleEventCardsIntoPlayerDeck(this.playerDeck, this);
         transferPlayToNextPlayer();
     }
 
@@ -343,34 +346,6 @@ public class BoardStatusController {
         userSelection.thenAccept(selectedPlayer::forceRelocatePlayer); //Method reference
     }
 
-    private boolean handlePlayEventCard() {
-        Player currentPlayer = this.players[currentPlayerTurn];
-        ArrayList<PlayerCard> eventCardsInHand = getEventCardsInHand(currentPlayer);
-
-        if (eventCardsInHand.isEmpty()) {
-            return false;
-        }
-
-        EventCard eventCardToPlay = (EventCard) this.gameWindow.promptSelectPlayerCard(eventCardsInHand.toArray(new PlayerCard[0]),
-                bundle.getString("selectAnEventCard"), bundle.getString("whichEventCardWouldYouLikeToPlay"));
-        if (eventCardToPlay == null) {
-            return false;
-        }
-        eventCardToPlay.use();
-        currentPlayer.cardsInHand.remove(eventCardToPlay);
-        return false;
-    }
-
-    private ArrayList<PlayerCard> getEventCardsInHand(Player player) {
-        ArrayList<PlayerCard> eventCardsInHand = new ArrayList<>();
-        for (PlayerCard playerCard : player.getCardsInHand()) {
-            if (playerCard.isEvent()) {
-                eventCardsInHand.add(playerCard);
-            }
-        }
-        return eventCardsInHand;
-    }
-
     private void gameEnd(GameEndCondition endCondition) {
         this.gameOver = true;
         String gameOverMessage = switch (endCondition) {
@@ -439,6 +414,10 @@ public class BoardStatusController {
         playersDrawStartingHands();
     }
 
+    public void playEventCard(Player currentPlayer, EventCard eventCardToPlay) {
+        eventCardManager.playEventCard(currentPlayer, eventCardToPlay);
+    }
+
     public void initializePlayers() {
         ArrayList<Player> allPossiblePlayers = new ArrayList<>();
         City atlanta = getCityByName(bundle.getString("atlanta"));
@@ -474,29 +453,6 @@ public class BoardStatusController {
                 playerDeck.push(singleCardDeck.pop());
             }
         }
-    }
-
-    private void shuffleEventCardsIntoPlayerDeck() {
-        EventCard[] eventCards = createArrayWithAllEventCards();
-        for (EventCard eventCard : eventCards) {
-            insertEventCardIntoPlayerDeckAtRandomIndex(eventCard);
-        }
-    }
-
-    private EventCard[] createArrayWithAllEventCards() {
-        return new EventCard[]{
-                new EventCard(EventName.AIRLIFT, this),
-                new EventCard(EventName.ONE_QUIET_NIGHT, this),
-                new EventCard(EventName.GOVERNMENT_GRANT, this),
-                new EventCard(EventName.FORECAST, this),
-                new EventCard(EventName.RESILIENT_POPULATION, this),
-        };
-    }
-
-    private void insertEventCardIntoPlayerDeckAtRandomIndex(EventCard eventCard) {
-        Random rand = new Random();
-        int indexToInsertEventCard = rand.nextInt(this.playerDeck.size());
-        this.playerDeck.insertElementAt(eventCard, indexToInsertEventCard);
     }
 
     public String generatePlayerName(int playerNumber, Player player) {
@@ -704,8 +660,8 @@ public class BoardStatusController {
 
     public void playerHandFull(Player currentPlayer) {
         while (currentPlayer.handSize() > 7) {
-            if (handContainsEventCard(currentPlayer)) {
-                boolean playedEventCard = givePlayerOptionToPlayEventCard(currentPlayer);
+            if (eventCardManager.handContainsEventCard(currentPlayer)) {
+                boolean playedEventCard = eventCardManager.givePlayerOptionToPlayEventCard(currentPlayer);
                 if (playedEventCard) {
                     return;
                 }
@@ -722,51 +678,6 @@ public class BoardStatusController {
                 currentPlayer.discardCardWithName(cardToDiscardName);
             }
         }
-    }
-
-    private boolean givePlayerOptionToPlayEventCard(Player currentPlayer) {
-        ArrayList<String> cardsToSelectFrom = new ArrayList<>();
-
-        String[] possibleActions = new String[]{bundle.getString("playAnEventCard"), bundle.getString("discardACard")};
-        String handOverflowingAction = gameWindow.promptSelectOption(possibleActions,
-                bundle.getString("yourHandIsFull"), bundle.getString("youreHoldingAnEventCardWouldYouLikeToPlayItOrDiscardACard"));
-        if (!handOverflowingAction.equals(bundle.getString("playAnEventCard"))) {
-            return false;
-        }
-
-        getPossibleEventCardsToPlay(currentPlayer, cardsToSelectFrom);
-        String eventCardNameToPlay = gameWindow.promptSelectOption(cardsToSelectFrom.toArray(new String[0]),
-                bundle.getString("playAnEventCard"), bundle.getString("selectAnEventCardToPlay"));
-
-        for (PlayerCard card : currentPlayer.cardsInHand) {
-            if (card.name.equals(eventCardNameToPlay)) {
-                playEventCard(currentPlayer, (EventCard) card);
-                break;
-            }
-        }
-        return true;
-    }
-
-    private void getPossibleEventCardsToPlay(Player currentPlayer, ArrayList<String> cardsToSelectFrom) {
-        for (PlayerCard card : currentPlayer.cardsInHand) {
-            if (card.isEvent()) {
-                cardsToSelectFrom.add(card.name);
-            }
-        }
-    }
-
-    public void playEventCard(Player currentPlayer, EventCard eventCardToPlay) {
-        eventCardToPlay.use();
-        currentPlayer.discardCardWithName(eventCardToPlay.name);
-    }
-
-    private boolean handContainsEventCard(Player currentPlayer) {
-        for (PlayerCard card : currentPlayer.cardsInHand) {
-            if (card.isEvent()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public int[] diseaseCubesLeft() {
