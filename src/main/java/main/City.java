@@ -63,7 +63,6 @@ public class City {
         return this.treatDisease(infectionColor, diseaseCubeBank, true);
     }
 
-<<<<<<< HEAD
     // treatDisease will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
     // disease cube bank.
     public boolean treatDisease(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, boolean isMedic) {
@@ -80,16 +79,6 @@ public class City {
                 diseaseCubeBank.colorTreated(infectionColor);
                 return true;
             }
-=======
-    public void addCube(CityColor color){
-        diseaseLevels.put(color, getInfectionLevel(color) + 1);
-    }
-
-    public void removeCube(CityColor color){
-        int current = getInfectionLevel(color);
-        if(current > 0){
-            diseaseLevels.put(color, current-1);
->>>>>>> SCRUM-23-Feature-Envy-City
         }
         return false;
     }
@@ -108,7 +97,6 @@ public class City {
         return this.hasQuarantineSpecialist();
     }
 
-<<<<<<< HEAD
     // Infect will be pulled mostly into Disease Cube Bank so that will handle feature envy, and small class
     // disease cube bank.
     public void infect(CityColor infectionColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
@@ -122,8 +110,6 @@ public class City {
         }
     }
 
-=======
->>>>>>> SCRUM-23-Feature-Envy-City
     public void outbreak(CityColor diseaseColor, DiseaseCubeBank diseaseCubeBank, OutbreakManager outbreakManager) {
         if (!this.outbreakIsHappening) {
             this.outbreakIsHappening = true;
