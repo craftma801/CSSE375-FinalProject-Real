@@ -641,7 +641,7 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        bsc.currentPlayerTurn = 0;
         atlanta.infect(CityColor.YELLOW, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -661,8 +661,8 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
-        atlanta.infect(CityColor.BLUE, dcb,om);
+        bsc.currentPlayerTurn = 0;
+        atlanta.infect(CityColor.BLUE, dcb, om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
@@ -681,7 +681,7 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        bsc.currentPlayerTurn = 0;
         atlanta.infect(CityColor.RED, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.RED));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -701,7 +701,7 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
         bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        bsc.currentPlayerTurn = 0;
         atlanta.infect(CityColor.BLACK, dcb,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLACK));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
