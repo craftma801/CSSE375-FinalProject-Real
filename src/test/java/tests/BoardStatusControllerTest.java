@@ -643,7 +643,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testHandleTreatDiseaseYellow() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        DiseaseCubeBank dcb = EasyMock.niceMock(DiseaseCubeBank.class);
+        DiseaseCubeBank dcb = new DiseaseCubeBank();
         OutbreakManager om = EasyMock.niceMock(OutbreakManager.class);
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.YELLOW);
         EasyMock.replay(gw);
@@ -683,7 +683,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testHandleTreatDiseaseRed() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        DiseaseCubeBank dcb = EasyMock.niceMock(DiseaseCubeBank.class);
+        DiseaseCubeBank dcb = new DiseaseCubeBank();
         OutbreakManager om = EasyMock.niceMock(OutbreakManager.class);
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.RED);
         EasyMock.replay(gw);
@@ -703,7 +703,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testHandleTreatDiseaseBlack() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        DiseaseCubeBank dcb = EasyMock.niceMock(DiseaseCubeBank.class);
+        DiseaseCubeBank dcb = new DiseaseCubeBank();
         OutbreakManager om = EasyMock.niceMock(OutbreakManager.class);
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.BLACK);
         EasyMock.replay(gw);
@@ -1025,7 +1025,7 @@ public class BoardStatusControllerTest {
     @Test
     public void testHandleTreatDiseaseCured() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        DiseaseCubeBank dcb = EasyMock.niceMock(DiseaseCubeBank.class);
+        DiseaseCubeBank dcb = new DiseaseCubeBank();
         OutbreakManager om = EasyMock.niceMock(OutbreakManager.class);
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.YELLOW);
         EasyMock.replay(gw);
