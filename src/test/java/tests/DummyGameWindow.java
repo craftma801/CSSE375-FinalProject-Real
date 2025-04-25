@@ -18,7 +18,7 @@ public class DummyGameWindow implements GameWindowInterface {
     }
 
     @Override
-    public String promptSelectOption(String[] options, String title, String message) {
+    public String promptSelectOption(PromptWindowInputs inputs) {
         return "";
     }
 
@@ -43,17 +43,17 @@ public class DummyGameWindow implements GameWindowInterface {
     }
 
     @Override
-    public Player promptSelectPlayer(Player[] options, String title, String message) {
+    public Player promptSelectPlayer(PromptWindowInputs inputs) {
         return null;
     }
 
     @Override
-    public InfectionCard promptInfectionCard(InfectionCard[] infectionCards, String title, String message) {
+    public InfectionCard promptInfectionCard(PromptWindowInputs inputs) {
         return null;
     }
 
     @Override
-    public PlayerCard promptSelectPlayerCard(PlayerCard[] playerCards, String title, String message) {
+    public PlayerCard promptSelectPlayerCard(PromptWindowInputs inputs) {
         return null;
     }
 

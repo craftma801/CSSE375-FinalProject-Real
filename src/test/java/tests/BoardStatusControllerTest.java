@@ -120,8 +120,8 @@ public class BoardStatusControllerTest {
         bsc.nextPlayerTurn();
         EventCard airlift = new EventCard(EventName.AIRLIFT,bsc);
 
-        EasyMock.expect(gw.promptSelectPlayerCard(anyObject(),anyObject(),anyObject())).andReturn(airlift);
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(),anyObject())).andReturn(bsc.players[1]);
+        EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(airlift);
+        EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(bsc.players[1]);
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(london));
         EasyMock.replay(gw);
 
@@ -143,7 +143,7 @@ public class BoardStatusControllerTest {
         bsc.nextPlayerTurn();
         EventCard governmentGrant = new EventCard(EventName.GOVERNMENT_GRANT,bsc);
 
-        EasyMock.expect(gw.promptSelectPlayerCard(anyObject(),anyObject(),anyObject())).andReturn(governmentGrant);
+        EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(governmentGrant);
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
         EasyMock.replay(gw);
 
@@ -168,7 +168,7 @@ public class BoardStatusControllerTest {
         bsc.nextPlayerTurn();
         EventCard governmentGrant = new EventCard(EventName.GOVERNMENT_GRANT,bsc);
 
-        EasyMock.expect(gw.promptSelectPlayerCard(anyObject(),anyObject(),anyObject())).andReturn(null);
+        EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(null);
         EasyMock.replay(gw);
 
         assertEquals(4,bsc.currentPlayerRemainingActions);
@@ -197,7 +197,7 @@ public class BoardStatusControllerTest {
 
         mockedGameWindow.displayInfectionCards(anyObject(), anyObject());
         EasyMock.expectLastCall();
-        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Put cards back on deck");
+        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Put cards back on deck");
         mockedGameWindow.destroyCurrentInfectionCardsDialog();
         EasyMock.expectLastCall();
 
@@ -240,12 +240,12 @@ public class BoardStatusControllerTest {
 
         for (int i = 0; i < 3; i++) {
             int highIndex = cityNames.length - 1 - i;
-            EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Continue Rearranging");
-            EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject(), anyObject(), anyObject())).andReturn(listOfInfectionCards[i]);
-            EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject(), anyObject(), anyObject())).andReturn(listOfInfectionCards[highIndex]);
+            EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Continue Rearranging");
+            EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[i]);
+            EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[highIndex]);
         }
 
-        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Put cards back on deck");
+        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Put cards back on deck");
 
         for (int i = 0; i < cityNames.length / 2 + 1; i++) {
             mockedGameWindow.displayInfectionCards(anyObject(), anyObject());
@@ -290,11 +290,11 @@ public class BoardStatusControllerTest {
 
         bsc.infectionDeck = testInfectionDeck;
 
-        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Continue Rearranging");
-        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject(), anyObject(), anyObject())).andReturn(listOfInfectionCards[1]);
-        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject(), anyObject(), anyObject())).andReturn(listOfInfectionCards[4]);
+        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Continue Rearranging");
+        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[1]);
+        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[4]);
 
-        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject(), anyObject(), anyObject())).andReturn("Put cards back on deck");
+        EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Put cards back on deck");
 
         mockedGameWindow.displayInfectionCards(anyObject(), anyObject());
         EasyMock.expectLastCall();
@@ -343,7 +343,7 @@ public class BoardStatusControllerTest {
         bsc.addToInfectionDiscardPile(chicagoCard);
         bsc.addToInfectionDiscardPile(washingtonCard);
 
-        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject(), anyObject(), anyObject())).andReturn(atlantaCard);
+        EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(atlantaCard);
         EasyMock.replay(mockedGameWindow);
 
         assertEquals(3, bsc.infectionDiscardPileSize());
@@ -504,7 +504,7 @@ public class BoardStatusControllerTest {
         EventCard oneQuietNightCard = new EventCard(EventName.ONE_QUIET_NIGHT, this.bsc);
         medic.drawCard(oneQuietNightCard);
 
-        EasyMock.expect(mockedGameWindow.promptSelectPlayerCard(anyObject(), anyObject(), anyObject())).andReturn(oneQuietNightCard);
+        EasyMock.expect(mockedGameWindow.promptSelectPlayerCard(anyObject())).andReturn(oneQuietNightCard);
         mockedGameWindow.repaintGameBoard();
         EasyMock.expectLastCall();
         EasyMock.replay(mockedGameWindow);
@@ -732,8 +732,8 @@ public class BoardStatusControllerTest {
         PlayerCard atlantaCard = new PlayerCard(atlanta);
 
 
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(),anyObject())).andReturn(secondTestPlayer);
-        EasyMock.expect(gw.promptSelectPlayerCard(anyObject(),anyObject(),anyObject())).andReturn(atlantaCard);
+        EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(secondTestPlayer);
+        EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(atlantaCard);
         gw.displayNextPlayerInfo(anyObject(),anyInt());
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
@@ -759,8 +759,8 @@ public class BoardStatusControllerTest {
         PlayerCard atlantaCard = new PlayerCard(atlanta);
 
 
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(),anyObject())).andReturn(secondTestPlayer);
-        EasyMock.expect(gw.promptSelectPlayerCard(anyObject(),anyObject(),anyObject())).andReturn(atlantaCard);
+        EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(secondTestPlayer);
+        EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(atlantaCard);
         EasyMock.replay(gw);
 
 
@@ -781,7 +781,7 @@ public class BoardStatusControllerTest {
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
 
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(),anyObject())).andReturn(null);
+        EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(null);
         EasyMock.replay(gw);
 
 
@@ -885,7 +885,7 @@ public class BoardStatusControllerTest {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         createNewBSCWithTestMap(gw);
         EventCard oqn = new EventCard(EventName.ONE_QUIET_NIGHT,bsc);
-        EasyMock.expect(gw.promptSelectOption(anyObject(),anyObject(), anyObject())).andReturn(oqn.getEventName());
+        EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(oqn.getEventName());
         EasyMock.replay(gw);
         bsc.setup();
         bsc.initializePlayers();
@@ -905,7 +905,7 @@ public class BoardStatusControllerTest {
         createNewBSCWithTestMap(gw);
         bsc.setup();
         bsc.initializePlayers();
-        EasyMock.expect(gw.promptSelectPlayer(anyObject(),anyObject(), anyObject())).andReturn(bsc.players[1]);
+        EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(bsc.players[1]);
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
         EasyMock.replay(gw);
         bsc.transferPlayToNextPlayer();
@@ -925,8 +925,8 @@ public class BoardStatusControllerTest {
         bsc.setup();
         bsc.initializePlayers();
         PlayerCard chicagoCard = new PlayerCard(chicago);
-        EasyMock.expect(gw.promptSelectOption(anyObject(),anyObject(),anyObject())).andReturn(miami.name);
-        EasyMock.expect(gw.promptSelectOption(anyObject(),anyObject(),anyObject())).andReturn(chicagoCard.getName());
+        EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(miami.name);
+        EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(chicagoCard.getName());
         EasyMock.replay(gw);
         bsc.transferPlayToNextPlayer();
         OperationsExpert operationsExpert = new OperationsExpert(atlanta);
