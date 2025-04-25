@@ -1,9 +1,10 @@
 package tests;
 
-//import main.Point;
 import main.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.awt.*;
 
@@ -12,6 +13,24 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CityTest {
     private City testCity;
     private OutbreakManager outbreakManager;
+
+    // The following helper methods are used to reduce code duplication in these tests.
+    private void infectCityNTimes(DiseaseCubeBank dcb, City city, CityColor color, int times){
+        for (int i = 0; i < times; i++) {
+            dcb.infectCity(city, color, outbreakManager);
+        }
+    }
+
+    private void connectCities(City a, City b) {
+        a.addConnection(b);
+        b.addConnection(a);
+    }
+
+    private void resetOutbreakFlags(City... cities) {
+        for (City c : cities) {
+            c.outbreakIsHappening = false;
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -27,16 +46,15 @@ public class CityTest {
     @Test
     public void testInfectionLevelOneRed(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
+        infectCityNTimes(diseaseCubeBank, testCity, CityColor.RED, 1);
         assertEquals(1,this.testCity.getInfectionLevel(CityColor.RED));
     }
 
     @Test
     public void testInfectPastThreeRed(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(this.testCity, CityColor.RED, outbreakManager);
+
+        infectCityNTimes(diseaseCubeBank, testCity, CityColor.RED, 3);
         assertEquals(3,this.testCity.getInfectionLevel(CityColor.RED));
     }
 
@@ -44,10 +62,8 @@ public class CityTest {
     public void testOutbreaksActivate(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
-        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
-        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
-        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
-        diseaseCubeBank.infectCity(atlanta, CityColor.BLUE, outbreakManager);
+
+        infectCityNTimes(diseaseCubeBank, atlanta, atlanta.color, 4);
         assertEquals(1,outbreakManager.getOutbreaks());
         assertEquals(3,atlanta.getInfectionLevel(CityColor.BLUE));
     }
@@ -57,21 +73,11 @@ public class CityTest {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         City taipei = new City("Taipei", 0, 0, CityColor.RED);
         City hongKong = new City("Hong Kong", 0, 0, CityColor.RED);
+        connectCities(taipei, hongKong);
 
-        taipei.addConnection(hongKong);
-        hongKong.addConnection(taipei);
-
-        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(taipei, CityColor.RED, outbreakManager);
-
-        taipei.outbreakIsHappening = false;
-        hongKong.outbreakIsHappening = false;
-
-        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
-        diseaseCubeBank.infectCity(hongKong, CityColor.RED, outbreakManager);
+        infectCityNTimes(diseaseCubeBank, taipei, CityColor.RED, 4);
+        resetOutbreakFlags(taipei, hongKong);
+        infectCityNTimes(diseaseCubeBank, hongKong, CityColor.RED, 3);
 
         assertEquals(3, outbreakManager.getOutbreaks());
     }
@@ -81,18 +87,9 @@ public class CityTest {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         City baghdad =new City("Baghdad", 0, 0, CityColor.BLACK);
         City istanbul = new City("Istanbul", 0, 0, CityColor.BLACK);
-
-        baghdad.addConnection(istanbul);
-        istanbul.addConnection(baghdad);
-
-        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
-        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
-        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
-        diseaseCubeBank.infectCity(baghdad, CityColor.BLACK, outbreakManager);
-
-        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
-        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
-        diseaseCubeBank.infectCity(istanbul, CityColor.BLACK, outbreakManager);
+        connectCities(baghdad, istanbul);
+        infectCityNTimes(diseaseCubeBank, baghdad, baghdad.color, 4);
+        infectCityNTimes(diseaseCubeBank, istanbul, istanbul.color, 3);
 
         assertEquals(2, outbreakManager.getOutbreaks());
     }
@@ -132,20 +129,26 @@ public class CityTest {
     @Test
     public void testTreatDisease(){
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
+        infectCityNTimes(diseaseCubeBank, this.testCity, CityColor.YELLOW, 1);
         this.testCity.treatDisease(CityColor.YELLOW,diseaseCubeBank);
         assertEquals(0,this.testCity.getInfectionLevel(CityColor.YELLOW));
     }
 
     @Test
-    public void testTreatDisease2(){
+    public void testTreatDiseaseDecreasesInfectionLevel() {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
-        diseaseCubeBank.infectCity(this.testCity, CityColor.YELLOW, outbreakManager);
-        assertEquals(22,diseaseCubeBank.remainingCubes(CityColor.YELLOW));
-        this.testCity.treatDisease(CityColor.YELLOW,diseaseCubeBank);
-        assertEquals(1,this.testCity.getInfectionLevel(CityColor.YELLOW));
-        assertEquals(23,diseaseCubeBank.remainingCubes(CityColor.YELLOW));
+        infectCityNTimes(diseaseCubeBank, testCity, CityColor.YELLOW, 2);
+        testCity.treatDisease(CityColor.YELLOW, diseaseCubeBank);
+        assertEquals(1, testCity.getInfectionLevel(CityColor.YELLOW));
+    }
+
+    @Test
+    public void testTreatDiseaseReturnsCubeToBank() {
+        DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
+        infectCityNTimes(diseaseCubeBank, testCity, CityColor.YELLOW, 2);
+        assertEquals(22, diseaseCubeBank.remainingCubes(CityColor.YELLOW));
+        testCity.treatDisease(CityColor.YELLOW, diseaseCubeBank);
+        assertEquals(23, diseaseCubeBank.remainingCubes(CityColor.YELLOW));
     }
 
     @Test
@@ -155,22 +158,23 @@ public class CityTest {
         assertEquals(0,this.testCity.getInfectionLevel(CityColor.YELLOW));
     }
 
-    @Test
-    public void testMedicTreatDisease(){
-        testMedicTreatDiseaseHelper(CityColor.YELLOW);
-        testMedicTreatDiseaseHelper(CityColor.BLUE);
-        testMedicTreatDiseaseHelper(CityColor.BLACK);
-        testMedicTreatDiseaseHelper(CityColor.RED);
+// The below parameterized tests eliminate the too many asserts from testMedicTreatDisease and its helper method.
+    @ParameterizedTest
+    @EnumSource(value = CityColor.class, names = { "RED", "BLUE", "BLACK", "YELLOW" })
+    public void testMedicRemovesAllCubes_Param(CityColor color) {
+        DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
+        infectCityNTimes(diseaseCubeBank, testCity, color, 3);
+        testCity.medicTreatDisease(color, diseaseCubeBank);
+        assertEquals(0, testCity.getInfectionLevel(color));
     }
 
-    public void testMedicTreatDiseaseHelper(CityColor color){
+    @ParameterizedTest
+    @EnumSource(value = CityColor.class, names = { "RED", "BLUE", "BLACK", "YELLOW" })
+    public void testMedicReturnsCubesToBank_Param(CityColor color) {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
-        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
-        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
-        diseaseCubeBank.infectCity(this.testCity, color, outbreakManager);
-        assertEquals(21,diseaseCubeBank.remainingCubes(color));
-        this.testCity.medicTreatDisease(color,diseaseCubeBank);
-        assertEquals(0,this.testCity.getInfectionLevel(color));
-        assertEquals(24,diseaseCubeBank.remainingCubes(color));
+        infectCityNTimes(diseaseCubeBank, testCity, color, 3);
+        assertEquals(21, diseaseCubeBank.remainingCubes(color));
+        testCity.medicTreatDisease(color, diseaseCubeBank);
+        assertEquals(24, diseaseCubeBank.remainingCubes(color));
     }
 }
