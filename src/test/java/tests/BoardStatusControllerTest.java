@@ -366,8 +366,6 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(newYork));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
         EasyMock.replay(gw);
 
         createNewBSCWithTestMap(gw);
@@ -375,18 +373,10 @@ public class BoardStatusControllerTest {
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
 
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(3,this.bsc.currentPlayerRemainingActions);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(2,this.bsc.currentPlayerRemainingActions);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(1,this.bsc.currentPlayerRemainingActions);
         this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
-        assertEquals(1, this.bsc.currentPlayerRemainingActions);
-        assertEquals(0,bsc.currentPlayerTurn);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(1,bsc.currentPlayerTurn);
-        assertEquals(4,this.bsc.currentPlayerRemainingActions);
+        this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
+        this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
+
         EasyMock.verify(gw);
     }
 

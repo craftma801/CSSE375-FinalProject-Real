@@ -53,6 +53,7 @@ public class GameBoard extends JComponent {
     public CompletableFuture<City> selectCity(HashSet<City> options) {
         selectedCity = new CompletableFuture<>();
         selectableCities = options;
+        repaint(); //We need to repaint now, so that the non-selectable cities get greyed out.
         canSelectCity = true;
         return selectedCity;
     }
