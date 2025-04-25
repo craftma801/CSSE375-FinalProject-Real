@@ -37,8 +37,9 @@ public class GameBoard extends JComponent {
         graphics.drawImage(background, 0, 0, boardSize.width, boardSize.height, this);
         double xScale = boardSize.width / (double) Pandemic.BOARD_WIDTH;
         double yScale = boardSize.height / (double) Pandemic.BOARD_HEIGHT;
+        City.setUIScale(xScale, yScale);
         for (City city : cities) {
-            city.draw(graphics2D, this, xScale, yScale, canSelectCity ? selectableCities.contains(city) : true);
+            city.draw(graphics2D, this, !canSelectCity || selectableCities.contains(city));
         }
         if(canSelectCity) {
             selectionInfo.draw(graphics2D);

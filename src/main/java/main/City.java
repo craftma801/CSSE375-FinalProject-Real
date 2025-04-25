@@ -22,8 +22,8 @@ public class City {
     public final String name;
     public final int x;
     public final int y;
-    private double xScale;
-    private double yScale;
+    private static double xScale;
+    private static double yScale;
 
     public final CityColor color;
 
@@ -144,9 +144,12 @@ public class City {
         return total;
     }
 
-    public void draw(Graphics2D graphics2D, JComponent observer, double xScale, double yScale, boolean enabled) {
-        this.xScale = xScale;
-        this.yScale = yScale;
+    public static void setUIScale(double xScale, double yScale) {
+        City.xScale = xScale;
+        City.yScale = yScale;
+    }
+
+    public void draw(Graphics2D graphics2D, JComponent observer, boolean enabled) {
         int scaledRadius = (int) (CITY_RADIUS * xScale);
         Color drawColor = switch (this.color) {
             case YELLOW -> new Color(209, 187, 88);
@@ -259,8 +262,8 @@ public class City {
     }
 
     public double getScaledDistance(int destX, int destY) {
-        double xDist = Math.abs(destX - this.x) * xScale;
-        double yDist = Math.abs(destY - this.y) * yScale;
+        double xDist = getScaledX() - destX;
+        double yDist = getScaledY() - destY;
         return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
     }
 
