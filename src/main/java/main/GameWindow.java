@@ -22,7 +22,7 @@ public class GameWindow implements GameWindowInterface {
     private final StatusIndicator yellowTreatmentIndicator;
     private JDialog currentInfectionCardsDialog;
     private final ResourceBundle bundle;
-    private boolean viewCardsOpen = false;
+
     public GameWindow(ArrayList<City> cities) {
         this.bundle = Pandemic.bundle;
         this.windowFrame = new JFrame();
