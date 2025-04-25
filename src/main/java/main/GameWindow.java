@@ -21,6 +21,7 @@ public class GameWindow implements GameWindowInterface {
     private final StatusIndicator blueTreatmentIndicator;
     private final StatusIndicator yellowTreatmentIndicator;
     private JDialog currentInfectionCardsDialog;
+    private boolean viewCardsOpen = false;
     private final ResourceBundle bundle;
 
     public GameWindow(ArrayList<City> cities) {
@@ -222,6 +223,9 @@ public class GameWindow implements GameWindowInterface {
     }
 
     public void displayPlayerCards(Player[] players, Player currentPlayer) {
+        if(viewCardsOpen){
+            return;
+        }
         JPanel viewCardsPanel = new JPanel();
         GridLayout viewCardsLayout = new GridLayout(2, 2);
         viewCardsPanel.setLayout(viewCardsLayout);
@@ -257,7 +261,11 @@ public class GameWindow implements GameWindowInterface {
         }
         dialog.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH / 2, Pandemic.BOARD_HEIGHT / 2));
         dialog.pack();
+        if(viewCardsOpen){
+            dialog.remove(viewCardsPanel);
+        }
         dialog.setVisible(true);
+        viewCardsOpen = true;
     }
 
     public static Locale selectLocale(String message){
