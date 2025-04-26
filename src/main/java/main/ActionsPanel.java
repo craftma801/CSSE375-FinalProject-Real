@@ -42,7 +42,7 @@ public class ActionsPanel extends JPanel {
         this.treatDiseaseButton.setToolTipText(this.formatToolTip(
                 "Remove 1 disease cube from the city you are in, placing it in the cube",
                 "supply next to the board. If this disease color has been cured (see",
-                "Discover a Cure below), remove all cubes of that color from the city you",
+                "Discover Cure below), remove all cubes of that color from the city you",
                 "are in.",
                 "If the last cube of a cured disease is removed from the board, this disease",
                 "is eradicated."));
@@ -97,6 +97,8 @@ public class ActionsPanel extends JPanel {
         this.skipActionButton = new JButton(bundle.getString("skipAction"));
         this.skipActionButton.setToolTipText(this.formatToolTip(
                 "Skip one of your actions."));
+
+        ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
         setUpActionListeners();
         addAllElementsToThisPanel();
