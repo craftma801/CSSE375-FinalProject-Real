@@ -18,7 +18,7 @@ public class EventCard extends PlayerCard {
             case ONE_QUIET_NIGHT -> this.bsc.oneQuietNight();
             case RESILIENT_POPULATION -> this.bsc.resilientPopulation();
         }
-        bsc.addPlayerCardToDiscardPile(this);
+        bsc.playerDiscardPile.add(this);
         bsc.gameWindow.repaintGameBoard();
     }
 

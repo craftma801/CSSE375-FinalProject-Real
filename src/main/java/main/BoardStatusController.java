@@ -3,7 +3,6 @@ package main;
 import main.roles.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -26,12 +25,12 @@ public class BoardStatusController {
     public int infectionRateIndex;
     public DiseaseCubeBank cubeBank;
 
-    private HashMap<CityColor, DiseaseStatus> diseaseStatuses;
+    private final HashMap<CityColor, DiseaseStatus> diseaseStatuses;
 
     public GameWindowInterface gameWindow;
     public boolean isQuietNight;
     private boolean gameOver;
-    private int numEpidemicCards;
+    private final int numEpidemicCards;
     public OutbreakManager outbreakManager;
 
     private final ResourceBundle bundle;
@@ -150,7 +149,7 @@ public class BoardStatusController {
     }
 
     public void handleShuttleFlight() {
-        HashSet<City> citiesWithResearchStation = new HashSet();
+        HashSet<City> citiesWithResearchStation = new HashSet<>();
         for(City city : cityMap) {
             if(city.hasResearchStation()){
                 citiesWithResearchStation.add(city);
@@ -390,33 +389,12 @@ public class BoardStatusController {
         Collections.shuffle(this.infectionDeck);
     }
 
-    public void addToInfectionDeck(City city) {
-        InfectionCard cardToAdd = new InfectionCard(city);
-        this.infectionDeck.add(cardToAdd);
-    }
-
-    public void addToInfectionDiscardPile(InfectionCard cardToAdd) {
-        this.infectionDiscardPile.add(cardToAdd);
-    }
-
     private void initializePlayerDeck() {
         for (City currentCity : cityMap) {
             PlayerCard cardToAdd = new PlayerCard(currentCity);
             this.playerDeck.add(cardToAdd);
         }
         Collections.shuffle(this.playerDeck);
-    }
-
-    public void initFourGenericPlayers() {
-        City atlanta = getCityByName(bundle.getString("atlanta"));
-
-        for (int i = 0; i < 4; i++) {
-            Player newPlayer = new Player(Color.BLACK, atlanta);
-            newPlayer.name = generatePlayerName(i + 1, newPlayer);
-            players[i] = newPlayer;
-            atlanta.players.add(newPlayer);
-        }
-        playersDrawStartingHands();
     }
 
     public void playEventCard(Player currentPlayer, EventCard eventCardToPlay) {
@@ -478,7 +456,7 @@ public class BoardStatusController {
         return MessageFormat.format(bundle.getString("playerNumberAndRole"), playerNumber, roleName);
     }
 
-    private void playersDrawStartingHands() {
+    public void playersDrawStartingHands() {
         for (int i = 0; i < 6 - numPlayers; i++) {
             for (Player player : this.players) {
                 PlayerCard drawnCard = this.playerDeck.pop();
@@ -614,9 +592,7 @@ public class BoardStatusController {
 
     public void governmentGrant() {
         CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
-        userSelection.thenAccept((city) -> {
-            city.buildResearchStation();
-        });
+        userSelection.thenAccept(City::buildResearchStation);
     }
 
     public void oneQuietNight() {
@@ -712,23 +688,6 @@ public class BoardStatusController {
         for (int i = 0; i < this.infectionDiscardPile.size(); i++) {
             infectionDeck.push(infectionDiscardPile.pop());
         }
-    }
-
-    public int getCityInfectionLevel(String cityName, CityColor cityColor) {
-        City city = getCityByName(cityName);
-        return city.getInfectionLevel(cityColor);
-    }
-
-    public Stack<PlayerCard> getPlayerDiscardPile() {
-        return this.playerDiscardPile;
-    }
-
-    public void removeEventCardFromPlayerDiscardPile(EventCard card) {
-        this.playerDiscardPile.remove(card);
-    }
-
-    public void addPlayerCardToDiscardPile(PlayerCard card) {
-        this.playerDiscardPile.push(card);
     }
 
     public int getNumPlayers() {
