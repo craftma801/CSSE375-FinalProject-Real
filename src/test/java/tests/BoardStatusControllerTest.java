@@ -181,6 +181,20 @@ public class BoardStatusControllerTest {
                 .withEpidemicCards(4)
                 .build();
         bsc.setup();
+
+        initializeInfectionDeck();
+        expectMockWindowCalls(mockedGameWindow);
+
+        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
+        EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
+        player.drawCard(forecastCard);
+        assertTrue(player.getCardsInHand().contains(forecastCard));
+        bsc.playEventCard(player, forecastCard);
+
+        verifyForecastResults(player, forecastCard, mockedGameWindow);
+    }
+
+    private void initializeInfectionDeck() {
         Stack<InfectionCard> testInfectionDeck = new Stack<>();
         String[] cityNames = new String[]{"Washington", "Essen", "Delhi", "Chicago", "Baghdad", "Atlanta"};
         for (String cityName : cityNames) {
@@ -189,23 +203,18 @@ public class BoardStatusControllerTest {
             testInfectionDeck.push(cardToAdd);
         }
         bsc.infectionDeck = testInfectionDeck;
+    }
 
+    private void expectMockWindowCalls(GameWindow mockedGameWindow) {
         mockedGameWindow.displayInfectionCards(anyObject(), anyObject());
         EasyMock.expectLastCall();
         EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Put cards back on deck");
         mockedGameWindow.destroyCurrentInfectionCardsDialog();
         EasyMock.expectLastCall();
-
         EasyMock.replay(mockedGameWindow);
+    }
 
-        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
-        EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
-
-        player.drawCard(forecastCard);
-        assertTrue(player.getCardsInHand().contains(forecastCard));
-
-        bsc.playEventCard(player, forecastCard);
-
+    private void verifyForecastResults(Player player, EventCard forecastCard, GameWindowInterface mockedGameWindow) {
         assertFalse(player.getCardsInHand().contains(forecastCard));
         String[] expectedCityNames = new String[]{"Atlanta", "Baghdad", "Chicago", "Delhi", "Essen", "Washington"};
         for (int i = 0; i < 6; i++) {
@@ -224,10 +233,25 @@ public class BoardStatusControllerTest {
                 .withEpidemicCards(4)
                 .build();
         bsc.setup();
+
+        String[] cityNames = new String[]{"Atlanta", "Baghdad", "Chicago", "Delhi", "Essen", "Washington"};
+        InfectionCard[] listOfInfectionCards = initializeInfectionDeckMultipleCards(cityNames);
+
+        expectMockWindowCallsMultipleCards(cityNames, mockedGameWindow, listOfInfectionCards);
+
+        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
+        EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
+        player.drawCard(forecastCard);
+        assertTrue(player.getCardsInHand().contains(forecastCard));
+        bsc.playEventCard(player, forecastCard);
+
+        verifyForecastResultsMultipleCalls(player, cityNames, forecastCard, mockedGameWindow);
+    }
+
+    private InfectionCard[] initializeInfectionDeckMultipleCards(String[] cityNames) {
         Stack<InfectionCard> testInfectionDeck = new Stack<>();
         Stack<InfectionCard> expectedInfectionDeck = new Stack<>();
         InfectionCard[] listOfInfectionCards = new InfectionCard[6];
-        String[] cityNames = new String[]{"Atlanta", "Baghdad", "Chicago", "Delhi", "Essen", "Washington"};
         for (int i = 0; i < cityNames.length; i++) {
             City currentCity = new City(cityNames[i], 0, 0, CityColor.BLUE);
             InfectionCard cardToAdd = new InfectionCard(currentCity);
@@ -238,13 +262,16 @@ public class BoardStatusControllerTest {
         bsc.infectionDeck = testInfectionDeck;
         Collections.reverse(expectedInfectionDeck);
 
+        return listOfInfectionCards;
+    }
+
+    private void expectMockWindowCallsMultipleCards(String[] cityNames, GameWindow mockedGameWindow, InfectionCard[] listOfInfectionCards) {
         for (int i = 0; i < 3; i++) {
             int highIndex = cityNames.length - 1 - i;
             EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Continue Rearranging");
             EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[i]);
             EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(listOfInfectionCards[highIndex]);
         }
-
         EasyMock.expect(mockedGameWindow.promptSelectOption(anyObject())).andReturn("Put cards back on deck");
 
         for (int i = 0; i < cityNames.length / 2 + 1; i++) {
@@ -253,17 +280,10 @@ public class BoardStatusControllerTest {
             mockedGameWindow.destroyCurrentInfectionCardsDialog();
             EasyMock.expectLastCall();
         }
-
         EasyMock.replay(mockedGameWindow);
+    }
 
-        Player player = new Medic(new City("Atlanta", 0, 0, CityColor.BLUE));
-        EventCard forecastCard = new EventCard(EventName.FORECAST, bsc);
-
-        player.drawCard(forecastCard);
-        assertTrue(player.getCardsInHand().contains(forecastCard));
-
-        bsc.playEventCard(player, forecastCard);
-
+    private void verifyForecastResultsMultipleCalls(Player player, String[] cityNames, EventCard forecastCard, GameWindow mockedGameWindow) {
         assertFalse(player.getCardsInHand().contains(forecastCard));
         for (String cityName : cityNames) {
             assertEquals(cityName, bsc.infectionDeck.pop().city.name);
