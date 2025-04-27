@@ -1,6 +1,5 @@
 package tests;
 
-//import main.Point;
 import main.*;
 import main.roles.*;
 import org.easymock.EasyMock;
@@ -13,52 +12,8 @@ import static org.easymock.EasyMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardStatusControllerTest {
+
     private BoardStatusController bsc;
-
-    private City chicago;
-    private City atlanta;
-    private City london;
-    private City newYork;
-    private City sanFrancisco;
-    private City montreal;
-    private City washington;
-    private City madrid;
-    private City miami;
-
-    private final int NUM_PLAYERS = 4;
-    private final int NUM_EPIDEMIC_CARDS = 4;
-
-    public void createNewBSCWithTestMap(GameWindowInterface gameWindow) {
-        chicago = new City("Chicago", 315, 405, CityColor.BLUE);
-        atlanta = new City("Atlanta", 380, 515, CityColor.BLUE);
-        london = new City("London", 0, 0, CityColor.BLUE);
-        sanFrancisco = new City("San Francisco", 105, 460, CityColor.BLUE);
-        montreal = new City("Montreal", 485, 400, CityColor.BLUE);
-        washington = new City("Washington", 555, 510, CityColor.BLUE);
-        newYork = new City("New York", 610, 420, CityColor.BLUE);
-        madrid = new City("Madrid", 890, 475, CityColor.BLUE);
-        miami = new City("Miami", 485, 635, CityColor.YELLOW);
-
-        chicago.addConnection(atlanta);
-        chicago.addConnection(montreal);
-        montreal.addConnection(newYork);
-        montreal.addConnection(chicago);
-        newYork.addConnection(montreal);
-        atlanta.addConnection(chicago);
-
-        ArrayList<City> basicMap = new ArrayList<>();
-        basicMap.add(chicago);
-        basicMap.add(atlanta);
-        basicMap.add(london);
-        basicMap.add(newYork);
-        basicMap.add(sanFrancisco);
-        basicMap.add(montreal);
-        basicMap.add(washington);
-        basicMap.add(madrid);
-        basicMap.add(miami);
-
-        this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
-    }
 
     public CompletableFuture<City> generateTestFuture(City city) {
         CompletableFuture<City> cityFuture = new CompletableFuture<City>();
@@ -68,13 +23,23 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testInitialInfectionRate() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         assertEquals(2, this.bsc.getInfectionRate());
     }
 
     @Test
     public void testAdditionalInfectionRates() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         assertEquals(2, this.bsc.getInfectionRate());
         this.bsc.increaseInfectionRate();
         this.bsc.increaseInfectionRate();
@@ -94,7 +59,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testInitializeInfectionDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         assertEquals(0, this.bsc.infectionDeckSize());
         this.bsc.setup();
         assertEquals(48, this.bsc.infectionDeckSize());
@@ -104,7 +74,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testInfectionDeckAfterGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         this.bsc.startGame();
         assertEquals(39, this.bsc.infectionDeckSize());
@@ -114,7 +89,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testAirlift() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
@@ -122,47 +102,57 @@ public class BoardStatusControllerTest {
 
         EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(airlift);
         EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(bsc.players[1]);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(london));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.london));
         EasyMock.replay(gw);
 
         bsc.players[0].drawCard(airlift);
         assertTrue(bsc.players[0].getCardsInHand().contains(airlift));
-        assertEquals(atlanta, bsc.players[1].getCity());
+        assertEquals(testBSC.atlanta, bsc.players[1].getCity());
         bsc.handleAction(PlayerAction.PLAY_EVENT_CARD);
 
-        assertEquals(london, bsc.players[1].getCity());
+        assertEquals(testBSC.london, bsc.players[1].getCity());
         assertFalse(bsc.players[0].getCardsInHand().contains(airlift));
     }
 
     @Test
     public void testGovernmentGrant() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
         EventCard governmentGrant = new EventCard(EventName.GOVERNMENT_GRANT,bsc);
 
         EasyMock.expect(gw.promptSelectPlayerCard(anyObject())).andReturn(governmentGrant);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.chicago));
         EasyMock.replay(gw);
 
         assertEquals(4,bsc.currentPlayerRemainingActions);
         bsc.handleAction(PlayerAction.PLAY_EVENT_CARD);
         assertEquals(4,bsc.currentPlayerRemainingActions);
-        assertFalse(chicago.hasResearchStation());
+        assertFalse(testBSC.chicago.hasResearchStation());
 
         bsc.players[0].drawCard(governmentGrant);
         assertTrue(bsc.players[0].getCardsInHand().contains(governmentGrant));
         bsc.handleAction(PlayerAction.PLAY_EVENT_CARD);
-        assertTrue(chicago.hasResearchStation());
+        assertTrue(testBSC.chicago.hasResearchStation());
         assertFalse(bsc.players[0].getCardsInHand().contains(governmentGrant));
     }
 
     @Test
     public void testEventCardToPlayNull() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
@@ -172,19 +162,24 @@ public class BoardStatusControllerTest {
         EasyMock.replay(gw);
 
         assertEquals(4,bsc.currentPlayerRemainingActions);
-        assertFalse(chicago.hasResearchStation());
+        assertFalse(testBSC.chicago.hasResearchStation());
         bsc.players[0].drawCard(governmentGrant);
         assertTrue(bsc.players[0].getCardsInHand().contains(governmentGrant));
         bsc.handleAction(PlayerAction.PLAY_EVENT_CARD);
         assertEquals(4,bsc.currentPlayerRemainingActions);
-        assertFalse(chicago.hasResearchStation());
+        assertFalse(testBSC.chicago.hasResearchStation());
         assertTrue(bsc.players[0].getCardsInHand().contains(governmentGrant));
     }
 
     @Test
     public void testForecastNoRearranging() {
         GameWindow mockedGameWindow = EasyMock.niceMock(GameWindow.class);
-        createNewBSCWithTestMap(mockedGameWindow);
+        this.bsc = new TestBSC()
+                .withGameWindow(mockedGameWindow)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
         Stack<InfectionCard> testInfectionDeck = new Stack<>();
         String[] cityNames = new String[]{"Washington", "Essen", "Delhi", "Chicago", "Baghdad", "Atlanta"};
@@ -222,7 +217,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testForecastReverseTopSixCards() {
         GameWindow mockedGameWindow = EasyMock.niceMock(GameWindow.class);
-        createNewBSCWithTestMap(mockedGameWindow);
+        this.bsc = new TestBSC()
+                .withGameWindow(mockedGameWindow)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
         Stack<InfectionCard> testInfectionDeck = new Stack<>();
         Stack<InfectionCard> expectedInfectionDeck = new Stack<>();
@@ -274,7 +274,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testForecastFiveCardsInDeck() {
         GameWindow mockedGameWindow = EasyMock.niceMock(GameWindow.class);
-        createNewBSCWithTestMap(mockedGameWindow);
+        this.bsc = new TestBSC()
+                .withGameWindow(mockedGameWindow)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
 
         String[] testCityNames = new String[]{"Atlanta", "Baghdad", "Chicago", "Delhi", "Washington"};
@@ -325,8 +330,13 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testOneQuietNight() {
-        createNewBSCWithTestMap(new DummyGameWindow());
-        bsc.addToInfectionDeck(atlanta);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        bsc.addToInfectionDeck(testBSC.atlanta);
         bsc.oneQuietNight();
         bsc.infectCitiesBasedOnInfectionRate();
         assertEquals(0, bsc.getCityInfectionLevel("Atlanta", CityColor.BLUE));
@@ -335,10 +345,15 @@ public class BoardStatusControllerTest {
     @Test
     public void testResilientPopulation() {
         GameWindow mockedGameWindow = EasyMock.niceMock(GameWindow.class);
-        createNewBSCWithTestMap(mockedGameWindow);
-        InfectionCard atlantaCard = new InfectionCard(atlanta);
-        InfectionCard chicagoCard = new InfectionCard(chicago);
-        InfectionCard washingtonCard = new InfectionCard(washington);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(mockedGameWindow)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        InfectionCard atlantaCard = new InfectionCard(testBSC.atlanta);
+        InfectionCard chicagoCard = new InfectionCard(testBSC.chicago);
+        InfectionCard washingtonCard = new InfectionCard(testBSC.washington);
         bsc.addToInfectionDiscardPile(atlantaCard);
         bsc.addToInfectionDiscardPile(chicagoCard);
         bsc.addToInfectionDiscardPile(washingtonCard);
@@ -363,14 +378,19 @@ public class BoardStatusControllerTest {
     public void testDriveFerry() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(newYork));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.chicago));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.montreal));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.newYork));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.miami));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.montreal));
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
         bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
@@ -400,16 +420,21 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptCureCards(anyObject())).andReturn("Washington");
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
 
-        Player player = new Medic(atlanta);
+        Player player = new Medic(testBSC.atlanta);
 
-        PlayerCard chicagoCard = new PlayerCard(chicago);
-        PlayerCard nyCard = new PlayerCard(newYork);
-        PlayerCard montrealCard = new PlayerCard(montreal);
-        PlayerCard sfCard = new PlayerCard(sanFrancisco);
-        PlayerCard washingtonCard = new PlayerCard(washington);
+        PlayerCard chicagoCard = new PlayerCard(testBSC.chicago);
+        PlayerCard nyCard = new PlayerCard(testBSC.newYork);
+        PlayerCard montrealCard = new PlayerCard(testBSC.montreal);
+        PlayerCard sfCard = new PlayerCard(testBSC.sanFrancisco);
+        PlayerCard washingtonCard = new PlayerCard(testBSC.washington);
 
         player.drawCard(chicagoCard);
         player.drawCard(nyCard);
@@ -431,15 +456,20 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptCureCards(anyObject())).andReturn("Montreal");
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
 
-        Player player = new Scientist(atlanta);
+        Player player = new Scientist(testBSC.atlanta);
 
-        PlayerCard chicagoCard = new PlayerCard(chicago);
-        PlayerCard nyCard = new PlayerCard(newYork);
-        PlayerCard montrealCard = new PlayerCard(montreal);
-        PlayerCard sfCard = new PlayerCard(sanFrancisco);
+        PlayerCard chicagoCard = new PlayerCard(testBSC.chicago);
+        PlayerCard nyCard = new PlayerCard(testBSC.newYork);
+        PlayerCard montrealCard = new PlayerCard(testBSC.montreal);
+        PlayerCard sfCard = new PlayerCard(testBSC.sanFrancisco);
 
         player.drawCard(chicagoCard);
         player.drawCard(nyCard);
@@ -458,7 +488,12 @@ public class BoardStatusControllerTest {
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         this.bsc.initializePlayers();
         this.bsc.nextPlayerTurn();
@@ -473,8 +508,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testEventCardsAddedToPlayerDeck() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        ArrayList<City> cityMap = Pandemic.createMap();
-        this.bsc = new BoardStatusController(new DummyGameWindow(), cityMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
 
         this.bsc.setup();
         assertEquals(48, this.bsc.playerDeckSize());
@@ -493,11 +532,15 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testPlayEventCard() {
-        ArrayList<City> cityMap = Pandemic.createMap();
         GameWindow mockedGameWindow = EasyMock.createMock(GameWindow.class);
-        this.bsc = new BoardStatusController(mockedGameWindow, cityMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(mockedGameWindow)
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
 
-        Medic medic = new Medic(atlanta);
+        Medic medic = new Medic(null);
         this.bsc.players = new Player[]{medic};
         this.bsc.currentPlayerTurn = 0;
         this.bsc.currentPlayerRemainingActions = 4;
@@ -523,16 +566,20 @@ public class BoardStatusControllerTest {
     public void testEpidemicIncreasesIndex(){
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         EasyMock.replay(gw);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.infectionDeck = new Stack<>();
-//        Point blackPoint = new Point(0,0);
         City blackCity = new City("BlackCity",0, 0,CityColor.BLACK);
         bsc.infectionDeck.push(new InfectionCard(blackCity));
         bsc.initializePlayers();
         bsc.playerDeck = new Stack<>();
         bsc.playerDeck.push(new PlayerCard(true));
-        bsc.playerDeck.push(new PlayerCard(atlanta));
+        bsc.playerDeck.push(new PlayerCard(testBSC.atlanta));
         bsc.transferPlayToNextPlayer();
         bsc.drawTwoPlayerCards();
         assertEquals(1,bsc.infectionRateIndex);
@@ -540,7 +587,12 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testEpidemicIncrementsInfectionRate() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
         bsc.epidemic();
         bsc.epidemic();
@@ -552,7 +604,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testEpidemicAndEventCardsShuffledInAtGameStart() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
-        bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
         bsc.startGame();
         assertEquals(49, bsc.playerDeckSize());
@@ -560,7 +617,12 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testDiseaseCubeBankInitialize() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.setup();
         int[] toCheck = bsc.diseaseCubesLeft();
         assertEquals(24, toCheck[0]);
@@ -573,7 +635,12 @@ public class BoardStatusControllerTest {
     @Test
     public void checkEradicationStatus() {
         GameWindowInterface gw = EasyMock.mock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.cureDisease(CityColor.YELLOW);
         bsc.handleAction(PlayerAction.SKIP_ACTION);
         assertEquals(DiseaseStatus.ERADICATED, bsc.getStatus(CityColor.YELLOW));
@@ -582,7 +649,12 @@ public class BoardStatusControllerTest {
     @Test
     public void twoColorsEradicated() {
         GameWindowInterface gw = EasyMock.mock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         bsc.cureDisease(CityColor.RED);
         bsc.cureDisease(CityColor.BLACK);
         bsc.handleAction(PlayerAction.SKIP_ACTION);
@@ -595,27 +667,37 @@ public class BoardStatusControllerTest {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         OutbreakManager obm = EasyMock.niceMock(OutbreakManager.class);
         DiseaseCubeBank dcb = EasyMock.niceMock(DiseaseCubeBank.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.cureDisease(CityColor.BLUE);
         bsc.handleAction(PlayerAction.SKIP_ACTION);
         assertEquals(DiseaseStatus.ERADICATED, bsc.getStatus(CityColor.BLUE));
-        InfectionCard testCard = new InfectionCard(atlanta);
+        InfectionCard testCard = new InfectionCard(testBSC.atlanta);
         testCard.cardDrawn(bsc.getStatus(CityColor.BLUE), dcb, obm);
-        assertEquals(0, atlanta.getInfectionLevel(CityColor.BLUE));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.BLUE));
     }
 
     @Test
     public void researchStationBuilt() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.chicago));
         EasyMock.replay(gw);
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
         assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
         assertEquals(3,this.bsc.currentPlayerRemainingActions);
-        PlayerCard chicagoCard = new PlayerCard(chicago);
+        PlayerCard chicagoCard = new PlayerCard(testBSC.chicago);
         Player currentPlayer = bsc.players[bsc.currentPlayerTurn];
         currentPlayer.drawCard(chicagoCard);
         bsc.handleAction(PlayerAction.BUILD_RESEARCH_STATION);
@@ -632,7 +714,12 @@ public class BoardStatusControllerTest {
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
@@ -648,16 +735,21 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.YELLOW);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
-        assertEquals(1,atlanta.getInfectionLevel(CityColor.YELLOW));
+        dcb.infectCity(testBSC.atlanta, CityColor.YELLOW,om);
+        assertEquals(1, testBSC.atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
         EasyMock.verify(gw);
-        assertEquals(0,atlanta.getInfectionLevel(CityColor.YELLOW));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.YELLOW));
     }
 
     @Test
@@ -668,16 +760,21 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.BLUE);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.BLUE, om);
-        assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
+        dcb.infectCity(testBSC.atlanta, CityColor.BLUE, om);
+        assertEquals(1, testBSC.atlanta.getInfectionLevel(CityColor.BLUE));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
         EasyMock.verify(gw);
-        assertEquals(0,atlanta.getInfectionLevel(CityColor.BLUE));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.BLUE));
     }
 
     @Test
@@ -688,16 +785,21 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.RED);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.RED,om);
-        assertEquals(1,atlanta.getInfectionLevel(CityColor.RED));
+        dcb.infectCity(testBSC.atlanta, CityColor.RED,om);
+        assertEquals(1, testBSC.atlanta.getInfectionLevel(CityColor.RED));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
         EasyMock.verify(gw);
-        assertEquals(0,atlanta.getInfectionLevel(CityColor.RED));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.RED));
     }
 
     @Test
@@ -708,28 +810,38 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.BLACK);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.BLACK,om);
-        assertEquals(1,atlanta.getInfectionLevel(CityColor.BLACK));
+        dcb.infectCity(testBSC.atlanta, CityColor.BLACK,om);
+        assertEquals(1, testBSC.atlanta.getInfectionLevel(CityColor.BLACK));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
         EasyMock.verify(gw);
-        assertEquals(0,atlanta.getInfectionLevel(CityColor.BLACK));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.BLACK));
     }
 
     @Test
     public void testGiveKnowledge() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
-        Player firstTestPlayer = new Medic(atlanta);
-        Player secondTestPlayer = new Researcher(atlanta);
-        PlayerCard atlantaCard = new PlayerCard(atlanta);
+        Player firstTestPlayer = new Medic(testBSC.atlanta);
+        Player secondTestPlayer = new Researcher(testBSC.atlanta);
+        PlayerCard atlantaCard = new PlayerCard(testBSC.atlanta);
 
 
         EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(secondTestPlayer);
@@ -750,13 +862,18 @@ public class BoardStatusControllerTest {
     @Test
     public void testTakeKnowledge() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
-        Player firstTestPlayer = new Medic(atlanta);
-        Player secondTestPlayer = new Researcher(atlanta);
-        PlayerCard atlantaCard = new PlayerCard(atlanta);
+        Player firstTestPlayer = new Medic(testBSC.atlanta);
+        Player secondTestPlayer = new Researcher(testBSC.atlanta);
+        PlayerCard atlantaCard = new PlayerCard(testBSC.atlanta);
 
 
         EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(secondTestPlayer);
@@ -776,14 +893,18 @@ public class BoardStatusControllerTest {
     @Test
     public void testTakeKnowledgeFails() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
 
         EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(null);
         EasyMock.replay(gw);
-
 
         assertThrows(ActionFailedException.class,bsc::handleTakeKnowledge);
     }
@@ -797,7 +918,12 @@ public class BoardStatusControllerTest {
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         bsc.initializePlayers();
         while(bsc.cubeBank.remainingCubes(CityColor.YELLOW) >= 0){
@@ -811,13 +937,23 @@ public class BoardStatusControllerTest {
 
     @Test
     public void testGetCityByName() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         assertThrows(RuntimeException.class, () -> bsc.getCityByName("bruh"));
     }
 
     @Test
     public void testCureDisease() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        this.bsc = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         testCureDiseaseHelper(CityColor.BLUE);
         testCureDiseaseHelper(CityColor.BLACK);
         testCureDiseaseHelper(CityColor.RED);
@@ -832,58 +968,78 @@ public class BoardStatusControllerTest {
     @Test
     public void testHandleCharterFlight() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.miami));
         EasyMock.replay(gw);
         bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
-        PlayerCard atlantaCard = new PlayerCard(atlanta);
+        PlayerCard atlantaCard = new PlayerCard(testBSC.atlanta);
         bsc.players[0].drawCard(atlantaCard);
         assertTrue(bsc.players[0].getCardsInHand().contains(atlantaCard));
         assertDoesNotThrow(() -> bsc.handleAction(PlayerAction.CHARTER_FLIGHT));
-        assertEquals(miami,bsc.players[0].getCity());
+        assertEquals(testBSC.miami,bsc.players[0].getCity());
         EasyMock.verify(gw);
     }
 
     @Test
     public void testHandleDirectFlight() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.miami));
         EasyMock.replay(gw);
         bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
-        assertEquals(atlanta,bsc.players[0].getCity());
-        PlayerCard miamiCard = new PlayerCard(miami);
+        assertEquals(testBSC.atlanta,bsc.players[0].getCity());
+        PlayerCard miamiCard = new PlayerCard(testBSC.miami);
         bsc.players[0].drawCard(miamiCard);
         assertTrue(bsc.players[0].getCardsInHand().contains(miamiCard));
         assertDoesNotThrow(()->bsc.handleAction(PlayerAction.DIRECT_FLIGHT));
-        assertEquals(miami,bsc.players[0].getCity());
+        assertEquals(testBSC.miami,bsc.players[0].getCity());
         EasyMock.verify(gw);
     }
 
     @Test
     public void testhandleShuttleFlight() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.miami));
         EasyMock.replay(gw);
         bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
-        assertEquals(atlanta,bsc.players[0].getCity());
-        miami.buildResearchStation();
+        assertEquals(testBSC.atlanta,bsc.players[0].getCity());
+        testBSC.miami.buildResearchStation();
         bsc.handleAction(PlayerAction.SHUTTLE_FLIGHT);
-        assertEquals(miami,bsc.players[0].getCity());
+        assertEquals(testBSC.miami,bsc.players[0].getCity());
         EasyMock.verify(gw);
     }
 
     @Test
     public void testHandleContingencyPlannerRoleAction(){
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         EventCard oqn = new EventCard(EventName.ONE_QUIET_NIGHT,bsc);
         EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(oqn.getEventName());
         EasyMock.replay(gw);
@@ -892,7 +1048,7 @@ public class BoardStatusControllerTest {
         bsc.transferPlayToNextPlayer();
         bsc.playerDiscardPile = new Stack<>();
         bsc.playerDiscardPile.push(oqn);
-        ContingencyPlanner contingencyPlanner = new ContingencyPlanner(atlanta,bsc);
+        ContingencyPlanner contingencyPlanner = new ContingencyPlanner(testBSC.atlanta,bsc);
         bsc.players[0] = contingencyPlanner;
         bsc.handleAction(PlayerAction.ROLE_ACTION);
         assertTrue(contingencyPlanner.isHoldingEventCard);
@@ -902,48 +1058,63 @@ public class BoardStatusControllerTest {
     @Test
     public void testDispatcherRoleAction() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
         EasyMock.expect(gw.promptSelectPlayer(anyObject())).andReturn(bsc.players[1]);
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
+        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(testBSC.chicago));
         EasyMock.replay(gw);
         bsc.transferPlayToNextPlayer();
-        Dispatcher dispatcher = new Dispatcher(atlanta);
+        Dispatcher dispatcher = new Dispatcher(testBSC.atlanta);
         bsc.players[0] = dispatcher;
-        assertEquals(atlanta,bsc.players[1].getCity());
+        assertEquals(testBSC.atlanta,bsc.players[1].getCity());
         assertEquals(4,bsc.currentPlayerRemainingActions);
         bsc.handleAction(PlayerAction.ROLE_ACTION);
-        assertEquals(chicago,bsc.players[1].getCity());
+        assertEquals(testBSC.chicago,bsc.players[1].getCity());
         assertEquals(3,bsc.currentPlayerRemainingActions);
     }
 
     @Test
     public void testOperationsExpertRoleAction() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
-        PlayerCard chicagoCard = new PlayerCard(chicago);
-        EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(miami.name);
+        PlayerCard chicagoCard = new PlayerCard(testBSC.chicago);
+        EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(testBSC.miami.name);
         EasyMock.expect(gw.promptSelectOption(anyObject())).andReturn(chicagoCard.getName());
         EasyMock.replay(gw);
         bsc.transferPlayToNextPlayer();
-        OperationsExpert operationsExpert = new OperationsExpert(atlanta);
+        OperationsExpert operationsExpert = new OperationsExpert(testBSC.atlanta);
         bsc.players[0] = operationsExpert;
         operationsExpert.drawCard(chicagoCard);
-        assertEquals(atlanta,bsc.players[0].getCity());
+        assertEquals(testBSC.atlanta,bsc.players[0].getCity());
         bsc.handleAction(PlayerAction.ROLE_ACTION);
-        assertEquals(miami,bsc.players[0].getCity());
+        assertEquals(testBSC.miami,bsc.players[0].getCity());
     }
 
     @Test
     public void testNoRoleAction() {
-        createNewBSCWithTestMap(new DummyGameWindow());
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
-        Medic medic = new Medic(atlanta);
+        Medic medic = new Medic(testBSC.atlanta);
         bsc.players[0] = medic;
         assertEquals(4,bsc.currentPlayerRemainingActions);
         bsc.handleAction(PlayerAction.ROLE_ACTION);
@@ -953,19 +1124,24 @@ public class BoardStatusControllerTest {
     @Test
     public void handleCureDiseaseFail() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         bsc.setup();
         bsc.initializePlayers();
-        PlayerCard chicagoCard = new PlayerCard(chicago);
-        PlayerCard miamiCard = new PlayerCard(miami);
-        PlayerCard atlantaCard = new PlayerCard(atlanta);
-        PlayerCard montrealCard = new PlayerCard(montreal);
-        PlayerCard washingtonCard = new PlayerCard(washington);
-        EasyMock.expect(gw.promptCureCards(anyObject())).andReturn(miami.name);
-        EasyMock.expect(gw.promptCureCards(anyObject())).andReturn(washington.name);
+        PlayerCard chicagoCard = new PlayerCard(testBSC.chicago);
+        PlayerCard miamiCard = new PlayerCard(testBSC.miami);
+        PlayerCard atlantaCard = new PlayerCard(testBSC.atlanta);
+        PlayerCard montrealCard = new PlayerCard(testBSC.montreal);
+        PlayerCard washingtonCard = new PlayerCard(testBSC.washington);
+        EasyMock.expect(gw.promptCureCards(anyObject())).andReturn(testBSC.miami.name);
+        EasyMock.expect(gw.promptCureCards(anyObject())).andReturn(testBSC.washington.name);
         EasyMock.replay(gw);
         bsc.transferPlayToNextPlayer();
-        Medic medic = new Medic(atlanta);
+        Medic medic = new Medic(testBSC.atlanta);
         this.bsc.playerDiscardPile = new Stack<>();
         bsc.players[0] = medic;
         bsc.players[0].drawCard(chicagoCard);
@@ -981,7 +1157,12 @@ public class BoardStatusControllerTest {
     @Test
     public void testDisplayGame() {
         GameWindowInterface gw = EasyMock.strictMock(GameWindowInterface.class);
-        bsc = new BoardStatusController(gw,Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withMap(Pandemic.createMap())
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         gw.showWindow();
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
@@ -996,7 +1177,12 @@ public class BoardStatusControllerTest {
         EasyMock.expectLastCall();
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         this.bsc.initializePlayers();
         while(bsc.outbreakManager.getOutbreaks() < 8){
@@ -1012,13 +1198,18 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(null);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        this.bsc = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4)
+                .build();
         this.bsc.setup();
         bsc.initializePlayers();
         bsc.nextPlayerTurn();
-        assertEquals(4,bsc.currentPlayerRemainingActions);
+        assertEquals(4, bsc.currentPlayerRemainingActions);
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
-        assertEquals(4,bsc.currentPlayerRemainingActions);
+        assertEquals(4, bsc.currentPlayerRemainingActions);
         EasyMock.verify(gw);
     }
 
@@ -1030,30 +1221,39 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.promptColorToCure(anyObject())).andReturn(CityColor.YELLOW);
         EasyMock.replay(gw);
 
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(gw)
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.initFourGenericPlayers();
         bsc.nextPlayerTurn();
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
-        dcb.infectCity(atlanta, CityColor.YELLOW,om);
+        dcb.infectCity(testBSC.atlanta, CityColor.YELLOW,om);
+        dcb.infectCity(testBSC.atlanta, CityColor.YELLOW,om);
         bsc.cureDisease(CityColor.YELLOW);
-        assertEquals(2,atlanta.getInfectionLevel(CityColor.YELLOW));
+        assertEquals(2, testBSC.atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
         EasyMock.verify(gw);
-        assertEquals(0,atlanta.getInfectionLevel(CityColor.YELLOW));
+        assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.YELLOW));
     }
 
     @Test
     public void testDoubleEpidemic() {
         GameWindowInterface gw = EasyMock.niceMock(GameWindowInterface.class);
         EasyMock.replay(gw);
-        createNewBSCWithTestMap(gw);
+        TestBSC testBSC = new TestBSC()
+                .withGameWindow(new DummyGameWindow())
+                .withDefaultMap()
+                .withPlayers(4)
+                .withEpidemicCards(4);
+        this.bsc = testBSC.build();
         this.bsc.setup();
         bsc.infectionDeck = new Stack<>();
-//        Point redPoint = new Point(0,0);
         City redCity = new City("RedCity", 0, 0,CityColor.RED);
-        bsc.infectionDeck.push(new InfectionCard(miami));
-        bsc.infectionDeck.push(new InfectionCard(atlanta));
+        bsc.infectionDeck.push(new InfectionCard(testBSC.miami));
+        bsc.infectionDeck.push(new InfectionCard(testBSC.atlanta));
         bsc.infectionDeck.push(new InfectionCard(redCity));
         bsc.initializePlayers();
         bsc.playerDeck = new Stack<>();
