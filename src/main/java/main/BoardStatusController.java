@@ -34,7 +34,7 @@ public class BoardStatusController {
     private int numEpidemicCards;
     public OutbreakManager outbreakManager;
 
-    private final ResourceBundle bundle;
+    public final ResourceBundle bundle;
     private final EventCardManager eventCardManager;
 
     public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers, int numEpidemicCards) {
@@ -60,7 +60,7 @@ public class BoardStatusController {
         this.infectionDeck = new Stack<>();
         this.infectionDiscardPile = new Stack<>();
         this.cubeBank = new DiseaseCubeBank();
-        this.currentPlayerTurn = getNumPlayers();
+        this.currentPlayerTurn = numPlayers;
         this.currentPlayerRemainingActions = 0;
         this.outbreakManager = new OutbreakManager(gameWindow);
 
@@ -253,20 +253,6 @@ public class BoardStatusController {
         throw new RuntimeException(cityName + " does not exist!");
     }
 
-    public String[] getCityNames() {
-        ArrayList<String> cityNames = new ArrayList<>();
-        for (City city : cityMap) {
-            cityNames.add(city.name);
-        }
-        return cityNames.toArray(new String[0]);
-    }
-
-    private void undoCureSelection(Player currentPlayer, int cardsDrawn) {
-        for (int i = 0; i < cardsDrawn; i++) {
-            currentPlayer.drawCard(playerDiscardPile.pop());
-        }
-    }
-
     private CityColor selectCureDiscardedCards(Player currentPlayer, String[] selectedCards, int numCards) {
         CityColor color = CityColor.EVENT_COLOR;
         for (int i = 0; i < numCards; i++) {
@@ -275,7 +261,9 @@ public class BoardStatusController {
             playerDiscardPile.push(currentPlayer.discardCardAtIndex(cardNames.indexOf(selectedCards[i])));
             color = getCityByName(selectedCards[0]).color;
             if (color != getCityByName(selectedCards[i]).color) {
-                undoCureSelection(currentPlayer, i + 1);
+                for (int j = 0; j < i + 1; j++) {
+                    currentPlayer.drawCard(playerDiscardPile.pop());
+                }
                 throw new ActionFailedException("You do not have the right cards for this operation!");
             }
         }
@@ -286,17 +274,11 @@ public class BoardStatusController {
         String cured = bundle.getString("cured");
         diseaseStatuses.put(color, DiseaseStatus.CURED);
         gameWindow.updateTreatmentIndicator(color, cured);
-        if (allDiseasesCured()) {
-            gameEnd(GameEndCondition.WIN_ALL_FOUR_CURES_DISCOVERED);
-        }
-    }
-
-    private boolean allDiseasesCured() {
         for(DiseaseStatus diseaseStatus : diseaseStatuses.values()){
             if(diseaseStatus != DiseaseStatus.CURED)
-                return false;
+                return;
         }
-        return true;
+        gameEnd(GameEndCondition.WIN_ALL_FOUR_CURES_DISCOVERED);
     }
 
     private boolean handleRoleAction(Player currentPlayer) {
@@ -319,7 +301,11 @@ public class BoardStatusController {
     }
 
     private boolean operationsExpertRoleAction(Player currentPlayer) {
-        String[] possibleDestinations = getCityNames();
+        ArrayList<String> cityNames = new ArrayList<>();
+        for (City city : cityMap) {
+            cityNames.add(city.name);
+        }
+        String[] possibleDestinations = cityNames.toArray(new String[0]);
         String destinationName = gameWindow.promptSelectOption(new PromptWindowInputs(possibleDestinations,
                 bundle.getString("selectALocation"), bundle.getString("whereWouldYouLikeToGo")));
 
@@ -492,7 +478,9 @@ public class BoardStatusController {
                 cubeBank.remainingCubes(CityColor.RED) < 0 || cubeBank.remainingCubes(CityColor.BLACK) < 0) {
             gameEnd(GameEndCondition.LOSE_RAN_OUT_OF_DISEASE_CUBES);
         }
-        resetOutbreakStatus();
+        for (City city : cityMap) {
+            city.outbreakIsHappening = false;
+        }
         if (outbreakManager.getOutbreaks() >= 8) {
             gameEnd(GameEndCondition.LOSE_OUTBREAK_MARKER_REACHED_LAST_SPACE);
         }
@@ -501,18 +489,12 @@ public class BoardStatusController {
 
     public void transferPlayToNextPlayer() {
         currentPlayerTurn++;
-        if (currentPlayerTurn >= getNumPlayers()) {
+        if (currentPlayerTurn >= numPlayers) {
             currentPlayerTurn = 0;
         }
         this.currentPlayerRemainingActions = 4;
         String nextPlayerName = players[currentPlayerTurn].name;
         gameWindow.displayNextPlayerInfo(nextPlayerName, this.currentPlayerRemainingActions);
-    }
-
-    public void resetOutbreakStatus() {
-        for (City city : cityMap) {
-            city.outbreakIsHappening = false;
-        }
     }
 
     public void infectCitiesBasedOnInfectionRate() {
@@ -607,35 +589,6 @@ public class BoardStatusController {
         }
     }
 
-    public void governmentGrant() {
-        CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
-        userSelection.thenAccept((city) -> {
-            city.buildResearchStation();
-        });
-    }
-
-    public void oneQuietNight() {
-        this.isQuietNight = true;
-    }
-
-    public void resilientPopulation() {
-        InfectionCard cardToRemove = gameWindow.promptInfectionCard(new PromptWindowInputs(infectionDiscardPile.toArray(new InfectionCard[0]),
-                bundle.getString("removeAnInfectionCard"), bundle.getString("selectAnInfectionCardToRemoveFromTheGame")));
-        infectionDiscardPile.remove(cardToRemove);
-    }
-
-    public int infectionDeckSize() {
-        return this.infectionDeck.size();
-    }
-
-    public int playerDeckSize() {
-        return this.playerDeck.size();
-    }
-
-    public int infectionDiscardPileSize() {
-        return this.infectionDiscardPile.size();
-    }
-
     public boolean drawTwoPlayerCards() {
         Player currentPlayer = players[currentPlayerTurn];
         try {
@@ -706,26 +659,5 @@ public class BoardStatusController {
         for (int i = 0; i < this.infectionDiscardPile.size(); i++) {
             infectionDeck.push(infectionDiscardPile.pop());
         }
-    }
-
-    public int getCityInfectionLevel(String cityName, CityColor cityColor) {
-        City city = getCityByName(cityName);
-        return city.getInfectionLevel(cityColor);
-    }
-
-    public Stack<PlayerCard> getPlayerDiscardPile() {
-        return this.playerDiscardPile;
-    }
-
-    public void removeEventCardFromPlayerDiscardPile(EventCard card) {
-        this.playerDiscardPile.remove(card);
-    }
-
-    public void addPlayerCardToDiscardPile(PlayerCard card) {
-        this.playerDiscardPile.push(card);
-    }
-
-    public int getNumPlayers() {
-        return numPlayers;
     }
 }

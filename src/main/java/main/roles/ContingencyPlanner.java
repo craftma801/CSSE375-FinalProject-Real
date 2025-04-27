@@ -23,7 +23,7 @@ public class ContingencyPlanner extends Player {
         if (this.isHoldingEventCard) {
             return false;
         }
-        Stack<PlayerCard> discardPile = bsc.getPlayerDiscardPile();
+        Stack<PlayerCard> discardPile = bsc.playerDiscardPile;
         ArrayList<String> eventCardsInDiscardPile = getEventCardsInDiscardPile(discardPile);
         if (eventCardsInDiscardPile.isEmpty()) {
             return false;
@@ -34,7 +34,7 @@ public class ContingencyPlanner extends Player {
             EventCard cardToTake = getCardToTake(discardPile, cardNameToTake);
             this.isHoldingEventCard = true;
             this.heldEventCard = cardToTake;
-            bsc.removeEventCardFromPlayerDiscardPile(cardToTake);
+            bsc.playerDiscardPile.remove(cardToTake);
         } catch(IllegalArgumentException e){
             return false;
         }

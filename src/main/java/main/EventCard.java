@@ -1,5 +1,8 @@
 package main;
 
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
+
 public class EventCard extends PlayerCard {
     EventName eventName;
     BoardStatusController bsc;
@@ -14,11 +17,25 @@ public class EventCard extends PlayerCard {
         switch (eventName) {
             case AIRLIFT -> this.bsc.airLift();
             case FORECAST -> this.bsc.forecast();
-            case GOVERNMENT_GRANT -> this.bsc.governmentGrant();
-            case ONE_QUIET_NIGHT -> this.bsc.oneQuietNight();
-            case RESILIENT_POPULATION -> this.bsc.resilientPopulation();
+            case GOVERNMENT_GRANT ->
+                    {
+                        CompletableFuture<City> userSelection = this.bsc.gameWindow.selectCity(new HashSet<>(this.bsc.cityMap));
+                        userSelection.thenAccept((city) -> {
+                            city.buildResearchStation();
+                        });
+                    }
+            case ONE_QUIET_NIGHT ->
+                    {
+                        this.bsc.isQuietNight = true;
+                    }
+            case RESILIENT_POPULATION ->
+                    {
+                        InfectionCard cardToRemove = this.bsc.gameWindow.promptInfectionCard(new PromptWindowInputs(this.bsc.infectionDiscardPile.toArray(new InfectionCard[0]),
+                                this.bsc.bundle.getString("removeAnInfectionCard"), this.bsc.bundle.getString("selectAnInfectionCardToRemoveFromTheGame")));
+                        this.bsc.infectionDiscardPile.remove(cardToRemove);
+                    }
         }
-        bsc.addPlayerCardToDiscardPile(this);
+        bsc.playerDiscardPile.push(this);
         bsc.gameWindow.repaintGameBoard();
     }
 
