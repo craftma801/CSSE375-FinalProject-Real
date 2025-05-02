@@ -30,8 +30,9 @@ public class GameBoard extends JComponent {
         graphics.drawImage(Toolkit.getDefaultToolkit().getImage("assets/PandemicBoard.png"), 0, 0, boardSize.width, boardSize.height, this);
         double xScale = boardSize.width / (double) Pandemic.BOARD_WIDTH;
         double yScale = boardSize.height / (double) Pandemic.BOARD_HEIGHT;
+        City.setUIScale(xScale, yScale);
         for (City city : cities) {
-            city.draw(graphics2D, this, xScale, yScale, canSelectCity ? selectableCities.contains(city) : true);
+            city.draw(graphics2D, this, !canSelectCity || selectableCities.contains(city));
         }
         if(canSelectCity) {
             new InfoBox(5, 5, 150, "Please select a city.").draw(graphics2D);
@@ -45,6 +46,7 @@ public class GameBoard extends JComponent {
     public CompletableFuture<City> selectCity(HashSet<City> options) {
         selectedCity = new CompletableFuture<>();
         selectableCities = options;
+        repaint(); //We need to repaint now, so that the non-selectable cities get greyed out.
         canSelectCity = true;
         return selectedCity;
     }

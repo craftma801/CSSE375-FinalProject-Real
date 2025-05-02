@@ -4,6 +4,7 @@ package tests;
 import main.*;
 import main.roles.*;
 import org.easymock.EasyMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -27,11 +28,14 @@ public class PlayerTest {
     private City washington;
     private City madrid;
     private City miami;
+    ArrayList<City> basicMap;
 
     private final int NUM_PLAYERS = 4;
     private final int NUM_EPIDEMIC_CARDS = 4;
 
-    private void setupBSC(GameWindowInterface gameWindow) {
+    //Give each test a fresh map
+    @BeforeEach
+    public void setupTestMap() {
         chicago = new City("Chicago", 315, 405, CityColor.BLUE);
         atlanta = new City("Atlanta", 380, 515, CityColor.BLUE);
         london = new City("London", 0, 0, CityColor.BLUE);
@@ -49,7 +53,7 @@ public class PlayerTest {
         newYork.addConnection(montreal);
         atlanta.addConnection(chicago);
 
-        ArrayList<City> basicMap = new ArrayList<>();
+        basicMap = new ArrayList<>();
 
         basicMap.add(chicago);
         basicMap.add(atlanta);
@@ -60,23 +64,23 @@ public class PlayerTest {
         basicMap.add(washington);
         basicMap.add(madrid);
         basicMap.add(miami);
+    }
 
+    private void setupBSC(GameWindowInterface gameWindow) {
         this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
     }
 
     @Test
     public void testGetCity() {
-        City testCity = new City("Test Towers", 2, 12, CityColor.YELLOW);
-        Player researcher = new Researcher(testCity);
-        assertEquals(testCity, researcher.getCity());
+        Player researcher = new Researcher(miami);
+        assertEquals(miami, researcher.getCity());
     }
 
     @Test
     public void testPlayerNames() {
         Pandemic.bundle = ResourceBundle.getBundle("messages", new Locale("en", "US"));
         bsc = new BoardStatusController(new DummyGameWindow(), Pandemic.createMap(), NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
-        City testCity = new City("Test Towers", 2, 12, CityColor.YELLOW);
-        Player player = new Researcher(testCity);
+        Player player = new Researcher(miami);
         player.name = bsc.generatePlayerName(1,player);
         assertEquals("Player 1 (Researcher)", player.name);
     }
@@ -85,45 +89,42 @@ public class PlayerTest {
     public void testNonMedicTreatDisease() {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         OutbreakManager outbreakManager = new OutbreakManager(new DummyGameWindow());
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
+        diseaseCubeBank.infectCity(miami, CityColor.YELLOW, outbreakManager);
+        diseaseCubeBank.infectCity(miami, CityColor.YELLOW, outbreakManager);
 
-        Player testPlayer = new Researcher(testCity);
+        Player testPlayer = new Researcher(miami);
         testPlayer.treatDisease(CityColor.YELLOW, diseaseCubeBank);
 
-        assertEquals(1, testCity.getInfectionLevel(CityColor.YELLOW));
+        assertEquals(1, miami.getInfectionLevel(CityColor.YELLOW));
     }
 
     @Test
     public void testMedicTreatDisease() {
         DiseaseCubeBank diseaseCubeBank = new DiseaseCubeBank();
         OutbreakManager outbreakManager = new OutbreakManager(new DummyGameWindow());
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
-        diseaseCubeBank.infectCity(testCity, CityColor.YELLOW, outbreakManager);
+        diseaseCubeBank.infectCity(miami, CityColor.YELLOW, outbreakManager);
+        diseaseCubeBank.infectCity(miami, CityColor.YELLOW, outbreakManager);
 
-        Player testPlayer = new Medic(testCity);
+        Player testPlayer = new Medic(miami);
         testPlayer.treatDisease(CityColor.YELLOW, diseaseCubeBank);
 
-        assertEquals(0, testCity.getInfectionLevel(CityColor.YELLOW));
+        assertEquals(0, miami.getInfectionLevel(CityColor.YELLOW));
 
         assertThrows(ActionFailedException.class, () -> testPlayer.treatDisease(CityColor.YELLOW, diseaseCubeBank));
     }
 
     @Test
     public void testBuildResearchStation() {
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        PlayerCard testCard = new PlayerCard(testCity);
-        Player testPlayer = new Medic(testCity);
+        PlayerCard testCard = new PlayerCard(miami);
+        Player testPlayer = new Medic(miami);
 
-        assertFalse(testCity.hasResearchStation());
+        assertFalse(miami.hasResearchStation());
         assertThrows(ActionFailedException.class, testPlayer::buildResearchStation);
-        assertFalse(testCity.hasResearchStation());
+        assertFalse(miami.hasResearchStation());
 
         testPlayer.drawCard(testCard);
         testPlayer.buildResearchStation();
-        assertTrue(testCity.hasResearchStation());
+        assertTrue(miami.hasResearchStation());
     }
 
     @Test
@@ -138,10 +139,8 @@ public class PlayerTest {
 
     @Test
     public void testDirectFlight() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
         PlayerCard testCard = new PlayerCard(chicago);
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer = new Researcher(testCity);
+        Player testPlayer = new Researcher(london);
         testPlayer.drawCard(testCard);
         testPlayer.directFlight(chicago);
         assertEquals(chicago, testPlayer.getCity());
@@ -149,20 +148,16 @@ public class PlayerTest {
 
     @Test
     public void testCharterFlight() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City baghdad = new City("Baghdad", 0, 0, CityColor.BLUE);
         PlayerCard testCard = new PlayerCard(chicago);
         Player testPlayer = new Researcher(chicago);
         testPlayer.drawCard(testCard);
-        testPlayer.charterFlight(baghdad);
-        assertEquals(baghdad, testPlayer.getCity());
+        testPlayer.charterFlight(london);
+        assertEquals(london, testPlayer.getCity());
     }
 
     @Test
     public void testShuttleFlight() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer = new Researcher(testCity);
+        Player testPlayer = new Researcher(london);
         chicago.buildResearchStation();
         testPlayer.shuttleFlight(chicago);
         assertEquals(chicago, testPlayer.getCity());
@@ -170,10 +165,9 @@ public class PlayerTest {
 
     @Test
     public void testShareKnowledgeTake() {
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer1 = new Medic(testCity);
-        Player testPlayer2 = new Researcher(testCity);
-        PlayerCard testCard = new PlayerCard(testCity);
+        Player testPlayer1 = new Medic(miami);
+        Player testPlayer2 = new Researcher(miami);
+        PlayerCard testCard = new PlayerCard(miami);
         testPlayer1.drawCard(testCard);
         testPlayer2.shareKnowledgeTake(testPlayer1, testCard);
         assertEquals(1, testPlayer2.handSize());
@@ -182,10 +176,9 @@ public class PlayerTest {
 
     @Test
     public void testShareKnowledgeGive() {
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer1 = new Medic(testCity);
-        Player testPlayer2 = new Researcher(testCity);
-        PlayerCard testCard = new PlayerCard(testCity);
+        Player testPlayer1 = new Medic(miami);
+        Player testPlayer2 = new Researcher(miami);
+        PlayerCard testCard = new PlayerCard(miami);
         testPlayer1.drawCard(testCard);
         testPlayer1.shareKnowledgeGive(testPlayer2, testCard);
         assertEquals(0, testPlayer1.handSize());
@@ -194,9 +187,8 @@ public class PlayerTest {
 
     @Test
     public void testGetCardNames() {
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer1 = new Medic(testCity);
-        PlayerCard testCard = new PlayerCard(testCity);
+        Player testPlayer1 = new Medic(miami);
+        PlayerCard testCard = new PlayerCard(miami);
         testPlayer1.drawCard(testCard);
         ArrayList<String> cardNames = testPlayer1.getCardNames();
         assertEquals(1, cardNames.size());
@@ -204,62 +196,52 @@ public class PlayerTest {
 
     @Test
     public void testBuildResearchStationAsOperationsExpert() {
-        City testCity = new City("Terre Haute", 40, 70, CityColor.YELLOW);
-        Player testPlayer = new OperationsExpert(testCity);
+        Player testPlayer = new OperationsExpert(miami);
         assertEquals(0, testPlayer.handSize());
         testPlayer.buildResearchStation();
-        assertTrue(testCity.hasResearchStation());
-        assertThrows(ActionFailedException.class, () -> testPlayer.buildResearchStation());
+        assertTrue(miami.hasResearchStation());
+        assertThrows(ActionFailedException.class, testPlayer::buildResearchStation);
     }
 
     @Test
     public void testOperationsExpertRoleAction() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City baghdad = new City("Baghdad", 0, 0, CityColor.BLUE);
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         atlanta.buildResearchStation();
         OperationsExpert testPlayer = new OperationsExpert(atlanta);
         PlayerCard testCard = new PlayerCard(chicago);
         testPlayer.drawCard(testCard);
-        testPlayer.operationsExpertAction(baghdad, "Chicago");
+        testPlayer.operationsExpertAction(london, "Chicago");
         assertEquals(0, testPlayer.handSize());
         assertEquals(0, atlanta.players.size());
-        assertEquals(baghdad, testPlayer.getCity());
-        assertEquals(1, baghdad.players.size());
+        assertEquals(london, testPlayer.getCity());
+        assertEquals(1, london.players.size());
     }
 
     @Test
     public void testOperationsExpertRoleActionFail() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City baghdad = new City("Baghdad", 0, 0, CityColor.BLUE);
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         atlanta.buildResearchStation();
         OperationsExpert testPlayer = new OperationsExpert(chicago);
         PlayerCard testCard = new PlayerCard(chicago);
         testPlayer.drawCard(testCard);
-        testPlayer.operationsExpertAction(baghdad, "Chicago");
+        testPlayer.operationsExpertAction(london, "Chicago");
         assertEquals(chicago, testPlayer.getCity());
-        assertEquals(0, baghdad.players.size());
+        assertEquals(0, london.players.size());
         assertEquals(1, testPlayer.handSize());
     }
 
     @Test
     public void testMovedByDispatcher() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City baghdad = new City("Baghdad", 0, 0, CityColor.BLUE);
         Player testPlayer = new Dispatcher(chicago);
-        Player testPlayer2 = new Scientist(baghdad);
+        Player testPlayer2 = new Scientist(london);
         testPlayer.forceRelocatePlayer(chicago);
-        testPlayer2.forceRelocatePlayer(baghdad);
+        testPlayer2.forceRelocatePlayer(london);
         assertEquals(testPlayer.getCity(), chicago);
-        assertEquals(testPlayer2.getCity(), baghdad);
-        testPlayer.forceRelocatePlayer(baghdad);
-        assertEquals(testPlayer.getCity(), baghdad);
+        assertEquals(testPlayer2.getCity(), london);
+        testPlayer.forceRelocatePlayer(london);
+        assertEquals(testPlayer.getCity(), london);
     }
 
     @Test
     public void testDrawCards() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         Player player = new Medic(atlanta);
         PlayerCard testCard = new PlayerCard(atlanta);
 
@@ -276,7 +258,6 @@ public class PlayerTest {
 
     @Test
     public void testDrawEpidemicCard() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         Player player = new Medic(atlanta);
 
         PlayerCard regularPlayerCard = new PlayerCard(atlanta);
@@ -317,8 +298,6 @@ public class PlayerTest {
 
     @Test
     public void testDiscardCardAtIndex() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         PlayerCard atlantaCard = new PlayerCard(atlanta);
         PlayerCard chicagoCard = new PlayerCard(chicago);
         Player player = new Medic(atlanta);
@@ -340,8 +319,6 @@ public class PlayerTest {
 
     @Test
     public void testDiscardCardWithName() {
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         PlayerCard atlantaCard = new PlayerCard(atlanta);
         PlayerCard chicagoCard = new PlayerCard(chicago);
         Player player = new Medic(atlanta);
@@ -363,7 +340,6 @@ public class PlayerTest {
 
     @Test
     public void testDiscardCardInvalidIndex() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         Player player = new Medic(atlanta);
         assertThrows(IndexOutOfBoundsException.class, () -> player.discardCardAtIndex(-1));
     }
@@ -372,8 +348,6 @@ public class PlayerTest {
     public void testContingencyPlannerTakeCardFromDiscardPile() {
         GameWindow gameWindow = EasyMock.createMock(GameWindow.class);
         setupBSC(gameWindow);
-
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
 
         ContingencyPlanner contingencyPlanner = new ContingencyPlanner(atlanta, bsc);
         EventCard oneQuietNightCard = new EventCard(EventName.ONE_QUIET_NIGHT, bsc);
@@ -414,7 +388,6 @@ public class PlayerTest {
         GameWindow gameWindow = EasyMock.niceMock(GameWindow.class);
         setupBSC(gameWindow);
 
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         ContingencyPlanner contingencyPlanner = new ContingencyPlanner(atlanta, bsc);
         EasyMock.replay(gameWindow);
 
@@ -433,8 +406,6 @@ public class PlayerTest {
     public void testPlayEventCardWhenHandOverflowing() {
         GameWindow gameWindow = EasyMock.niceMock(GameWindow.class);
         setupBSC(gameWindow);
-
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
 
         Player player = new Scientist(atlanta);
         PlayerCard playerCard = new PlayerCard(atlanta);
@@ -467,9 +438,6 @@ public class PlayerTest {
         GameWindow gameWindow = EasyMock.createMock(GameWindow.class);
         setupBSC(gameWindow);
 
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
-        City chicago = new City("Chicago", 0, 0, CityColor.BLUE);
-
         Player player = new Scientist(atlanta);
         PlayerCard atlantaCard = new PlayerCard(atlanta);
         PlayerCard chicagoCard = new PlayerCard(chicago);
@@ -500,14 +468,12 @@ public class PlayerTest {
 
     @Test
     public void testPlayerCardString() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         PlayerCard card = new PlayerCard(atlanta);
         assertEquals("Atlanta", card.toString());
     }
 
     @Test
     public void testPlayerToString() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         Player player = new Scientist(atlanta);
         player.name = "Scientist";
         assertEquals("Scientist", player.toString());
@@ -515,7 +481,6 @@ public class PlayerTest {
 
     @Test
     public void testPlayerIcon() {
-        City atlanta = new City("Atlanta", 0, 0, CityColor.BLUE);
         Player player = new Scientist(atlanta);
         assertInstanceOf(Image.class, player.getIcon());
     }

@@ -13,9 +13,12 @@ public class StatusIndicator extends JPanel {
 
         JLabel indLabel = new JLabel(labelText);
         this.valueLabel = new JLabel(defaultValue);
+        this.setOpaque(false);
+        indLabel.setForeground(GameWindow.TEXT_COLOR);
         indLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.valueLabel.setFont(new Font("Indicator", Font.BOLD, 24));
+        this.valueLabel.setForeground(GameWindow.TEXT_COLOR);
 
         this.setBorder(new EmptyBorder(0, 10, 0, 10));
 

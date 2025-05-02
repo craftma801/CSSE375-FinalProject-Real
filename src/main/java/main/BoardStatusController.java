@@ -3,7 +3,6 @@ package main;
 import main.roles.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -26,12 +25,12 @@ public class BoardStatusController {
     public int infectionRateIndex;
     public DiseaseCubeBank cubeBank;
 
-    private HashMap<CityColor, DiseaseStatus> diseaseStatuses;
+    private final HashMap<CityColor, DiseaseStatus> diseaseStatuses;
 
     public GameWindowInterface gameWindow;
     public boolean isQuietNight;
     private boolean gameOver;
-    private int numEpidemicCards;
+    private final int numEpidemicCards;
     public OutbreakManager outbreakManager;
 
     private final ResourceBundle bundle;
@@ -79,9 +78,8 @@ public class BoardStatusController {
     }
 
     public void handleAction(PlayerAction playerAction) {
-        boolean actionWasPerformed;
         try {
-            actionWasPerformed = switch (playerAction) {
+            switch (playerAction) {
                 case BUILD_RESEARCH_STATION -> handleBuildResearchStation();
                 case TREAT_DISEASE -> handleTreatDisease();
                 case GIVE_KNOWLEDGE -> handleGiveKnowledge();
@@ -94,12 +92,15 @@ public class BoardStatusController {
                 case VIEW_CARDS -> handleViewCards(players[currentPlayerTurn]);
                 case PLAY_EVENT_CARD -> eventCardManager.handlePlayEventCard(players[currentPlayerTurn]);
                 case ROLE_ACTION -> handleRoleAction(players[currentPlayerTurn]);
-                case SKIP_ACTION -> true;
+                case SKIP_ACTION -> actionAftermath(true);
             };
         } catch (ActionFailedException e) {
             handleActionFailure(e);
             return;
         }
+    }
+
+    private void actionAftermath(boolean actionWasPerformed) {
         if (actionWasPerformed) {
             currentPlayerRemainingActions--;
             gameWindow.updateRemainingActions(currentPlayerRemainingActions);
@@ -118,37 +119,37 @@ public class BoardStatusController {
         }
     }
 
-    private boolean handleBuildResearchStation() {
+    private void handleBuildResearchStation() {
         players[currentPlayerTurn].buildResearchStation();
-        return true;
+        actionAftermath(true);
     }
 
-    public boolean handleDriveFerry() {
+    public void handleDriveFerry() {
         CompletableFuture<City> userSelection = gameWindow.selectCity(players[currentPlayerTurn].driveFerryDestinations());
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].move(city);
+            actionAftermath(true);
         });
-        return true;
     }
 
-    public boolean handleDirectFlight() {
+    public void handleDirectFlight() {
         CompletableFuture<City> userSelection = gameWindow.selectCity(players[currentPlayerTurn].directFlightDestinations());
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].directFlight(city);
+            actionAftermath(true);
         });
-        return true;
     }
 
-    public boolean handleCharterFlight() {
+    public void handleCharterFlight() {
         CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].charterFlight(city);
+            actionAftermath(true);
         });
-        return true;
     }
 
-    public boolean handleShuttleFlight() {
-        HashSet<City> citiesWithResearchStation = new HashSet();
+    public void handleShuttleFlight() {
+        HashSet<City> citiesWithResearchStation = new HashSet<>();
         for(City city : cityMap) {
             if(city.hasResearchStation()){
                 citiesWithResearchStation.add(city);
@@ -157,16 +158,16 @@ public class BoardStatusController {
         CompletableFuture<City> userSelection = gameWindow.selectCity(citiesWithResearchStation);
         userSelection.thenAccept((city) -> {
             players[currentPlayerTurn].shuttleFlight(city);
+            actionAftermath(true);
         });
-        return true;
     }
 
-    public boolean handleViewCards(Player currentPlayer) {
+    public void handleViewCards(Player currentPlayer) {
         gameWindow.displayPlayerCards(players, currentPlayer);
-        return false;
+        actionAftermath(false);
     }
 
-    private boolean handleTreatDisease() {
+    private void handleTreatDisease() {
         CityColor[] colors = new CityColor[]{CityColor.YELLOW,
                 CityColor.RED,
                 CityColor.BLUE,
@@ -181,33 +182,35 @@ public class BoardStatusController {
         } else {
             players[currentPlayerTurn].treatDisease(colorToTreat, cubeBank);
         }
-        return true;
+        actionAftermath(true);
     }
 
-    public boolean handleTakeKnowledge() {
+    public void handleTakeKnowledge() {
         Player takingFrom = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("knowledge.take"), bundle.getString("selectThePlayerYouWouldLikeToTakeFrom")));
         if (takingFrom == null) {
-//            throw new ActionFailedException("Failed to take knowledge!");
-            return false;
+            actionAftermath(false);
+            throw new ActionFailedException("Failed to take knowledge");
         }
         PlayerCard taking = gameWindow.promptSelectPlayerCard(new PromptWindowInputs(takingFrom.getCardsInHand().toArray(new PlayerCard[0]),
                 bundle.getString("knowledge.share"), bundle.getString("selectCardToShare")));
         players[currentPlayerTurn].shareKnowledgeTake(takingFrom, taking);
-        return true;
+        actionAftermath(true);
     }
 
-    private boolean handleGiveKnowledge() {
+    private void handleGiveKnowledge() {
         Player givingTo = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("knowledge.give"), bundle.getString("selectThePlayerYouWouldLikeToGiveTo")));
         if (givingTo == null) {
-            return false;
+            actionAftermath(false);
+            return;
         }
         PlayerCard giving = gameWindow.promptSelectPlayerCard(new PromptWindowInputs(players[currentPlayerTurn].getCardsInHand().toArray(new PlayerCard[0]),
                 bundle.getString("knowledge.share"), bundle.getString("selectCardToShare")));
         if (giving == null) {
-            return false;
+            actionAftermath(false);
+            return;
         }
         players[currentPlayerTurn].shareKnowledgeGive(givingTo, giving);
-        return true;
+        actionAftermath(true);
     }
 
     public boolean handleDiscoverCure(Player cureDiscoverer) {
@@ -217,12 +220,14 @@ public class BoardStatusController {
         }
         if (cureDiscoverer.handSize() < cardsToCure ||
                 !cureDiscoverer.getCity().hasResearchStation()) {
+            actionAftermath(false);
             return false;
         }
         String[] selectedCards = new String[cardsToCure];
         CityColor color = selectCureDiscardedCards(
                 cureDiscoverer, selectedCards, cardsToCure);
         cureDisease(color);
+        actionAftermath(true);
         return true;
     }
 
@@ -299,26 +304,24 @@ public class BoardStatusController {
         return true;
     }
 
-    private boolean handleRoleAction(Player currentPlayer) {
+    private void handleRoleAction(Player currentPlayer) {
         Class<? extends Player> role = currentPlayer.getClass();
         if (!role.equals(OperationsExpert.class)) {
             if (role.equals(Dispatcher.class)) {
                 dispatcherRoleAction();
-                return true;
             } else if (role.equals(ContingencyPlanner.class)) {
-                return contingencyPlannerRoleAction(currentPlayer);
+                contingencyPlannerRoleAction(currentPlayer);
             }
         } else {
-            return operationsExpertRoleAction(currentPlayer);
+            operationsExpertRoleAction(currentPlayer);
         }
-        return false;
     }
 
-    private boolean contingencyPlannerRoleAction(Player currentPlayer) {
-        return ((ContingencyPlanner) currentPlayer).takeEventCardFromDiscardPile();
+    private void contingencyPlannerRoleAction(Player currentPlayer) {
+        actionAftermath(((ContingencyPlanner) currentPlayer).takeEventCardFromDiscardPile());
     }
 
-    private boolean operationsExpertRoleAction(Player currentPlayer) {
+    private void operationsExpertRoleAction(Player currentPlayer) {
         String[] possibleDestinations = getCityNames();
         String destinationName = gameWindow.promptSelectOption(new PromptWindowInputs(possibleDestinations,
                 bundle.getString("selectALocation"), bundle.getString("whereWouldYouLikeToGo")));
@@ -327,7 +330,7 @@ public class BoardStatusController {
         String cardNameToDiscard = gameWindow.promptSelectOption(new PromptWindowInputs(possibleCardsToDiscard,
                 bundle.getString("selectACard"), bundle.getString("whichCardWouldYouLikeToDiscard")));
 
-        return ((OperationsExpert) currentPlayer).operationsExpertAction(getCityByName(destinationName), cardNameToDiscard);
+        actionAftermath(((OperationsExpert) currentPlayer).operationsExpertAction(getCityByName(destinationName), cardNameToDiscard));
     }
 
     private void dispatcherRoleAction() {
@@ -344,6 +347,7 @@ public class BoardStatusController {
 
         CompletableFuture<City> userSelection = gameWindow.selectCity(possibleLocations);
         userSelection.thenAccept(selectedPlayer::forceRelocatePlayer); //Method reference
+        actionAftermath(true);
     }
 
     private void gameEnd(GameEndCondition endCondition) {
@@ -385,33 +389,12 @@ public class BoardStatusController {
         Collections.shuffle(this.infectionDeck);
     }
 
-    public void addToInfectionDeck(City city) {
-        InfectionCard cardToAdd = new InfectionCard(city);
-        this.infectionDeck.add(cardToAdd);
-    }
-
-    public void addToInfectionDiscardPile(InfectionCard cardToAdd) {
-        this.infectionDiscardPile.add(cardToAdd);
-    }
-
     private void initializePlayerDeck() {
         for (City currentCity : cityMap) {
             PlayerCard cardToAdd = new PlayerCard(currentCity);
             this.playerDeck.add(cardToAdd);
         }
         Collections.shuffle(this.playerDeck);
-    }
-
-    public void initFourGenericPlayers() {
-        City atlanta = getCityByName(bundle.getString("atlanta"));
-
-        for (int i = 0; i < 4; i++) {
-            Player newPlayer = new Player(Color.BLACK, atlanta);
-            newPlayer.name = generatePlayerName(i + 1, newPlayer);
-            players[i] = newPlayer;
-            atlanta.players.add(newPlayer);
-        }
-        playersDrawStartingHands();
     }
 
     public void playEventCard(Player currentPlayer, EventCard eventCardToPlay) {
@@ -473,7 +456,7 @@ public class BoardStatusController {
         return MessageFormat.format(bundle.getString("playerNumberAndRole"), playerNumber, roleName);
     }
 
-    private void playersDrawStartingHands() {
+    public void playersDrawStartingHands() {
         for (int i = 0; i < 6 - numPlayers; i++) {
             for (Player player : this.players) {
                 PlayerCard drawnCard = this.playerDeck.pop();
@@ -609,9 +592,7 @@ public class BoardStatusController {
 
     public void governmentGrant() {
         CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
-        userSelection.thenAccept((city) -> {
-            city.buildResearchStation();
-        });
+        userSelection.thenAccept(City::buildResearchStation);
     }
 
     public void oneQuietNight() {
@@ -706,23 +687,6 @@ public class BoardStatusController {
         for (int i = 0; i < this.infectionDiscardPile.size(); i++) {
             infectionDeck.push(infectionDiscardPile.pop());
         }
-    }
-
-    public int getCityInfectionLevel(String cityName, CityColor cityColor) {
-        City city = getCityByName(cityName);
-        return city.getInfectionLevel(cityColor);
-    }
-
-    public Stack<PlayerCard> getPlayerDiscardPile() {
-        return this.playerDiscardPile;
-    }
-
-    public void removeEventCardFromPlayerDiscardPile(EventCard card) {
-        this.playerDiscardPile.remove(card);
-    }
-
-    public void addPlayerCardToDiscardPile(PlayerCard card) {
-        this.playerDiscardPile.push(card);
     }
 
     public int getNumPlayers() {

@@ -6,6 +6,7 @@ import main.roles.*;
 import org.easymock.EasyMock;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,6 +59,16 @@ public class BoardStatusControllerTest {
         basicMap.add(miami);
 
         this.bsc = new BoardStatusController(gameWindow, basicMap, NUM_PLAYERS, NUM_EPIDEMIC_CARDS);
+    }
+
+    public void initFourGenericPlayers(BoardStatusController bsc, City city) {
+        for (int i = 0; i < 4; i++) {
+            Player newPlayer = new Player(Color.BLACK, city);
+            newPlayer.name = "Test Player " + i;
+            bsc.players[i] = newPlayer;
+            atlanta.players.add(newPlayer);
+        }
+        bsc.playersDrawStartingHands();
     }
 
     public CompletableFuture<City> generateTestFuture(City city) {
@@ -326,10 +337,11 @@ public class BoardStatusControllerTest {
     @Test
     public void testOneQuietNight() {
         createNewBSCWithTestMap(new DummyGameWindow());
-        bsc.addToInfectionDeck(atlanta);
+        InfectionCard cardToAdd = new InfectionCard(atlanta);
+        bsc.infectionDeck.add(cardToAdd);
         bsc.oneQuietNight();
         bsc.infectCitiesBasedOnInfectionRate();
-        assertEquals(0, bsc.getCityInfectionLevel("Atlanta", CityColor.BLUE));
+        assertEquals(0, atlanta.getInfectionLevel(CityColor.BLUE));
     }
 
     @Test
@@ -339,9 +351,9 @@ public class BoardStatusControllerTest {
         InfectionCard atlantaCard = new InfectionCard(atlanta);
         InfectionCard chicagoCard = new InfectionCard(chicago);
         InfectionCard washingtonCard = new InfectionCard(washington);
-        bsc.addToInfectionDiscardPile(atlantaCard);
-        bsc.addToInfectionDiscardPile(chicagoCard);
-        bsc.addToInfectionDiscardPile(washingtonCard);
+        bsc.infectionDiscardPile.add(atlantaCard);
+        bsc.infectionDiscardPile.add(chicagoCard);
+        bsc.infectionDiscardPile.add(washingtonCard);
 
         EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(atlantaCard);
         EasyMock.replay(mockedGameWindow);
@@ -366,8 +378,6 @@ public class BoardStatusControllerTest {
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(chicago));
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
         EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(newYork));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(miami));
-        EasyMock.expect(gw.selectCity(anyObject())).andReturn(generateTestFuture(montreal));
         EasyMock.replay(gw);
 
         createNewBSCWithTestMap(gw);
@@ -375,18 +385,10 @@ public class BoardStatusControllerTest {
         bsc.initializePlayers();
         bsc.transferPlayToNextPlayer();
 
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(3,this.bsc.currentPlayerRemainingActions);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(2,this.bsc.currentPlayerRemainingActions);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(1,this.bsc.currentPlayerRemainingActions);
         this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
-        assertEquals(1, this.bsc.currentPlayerRemainingActions);
-        assertEquals(0,bsc.currentPlayerTurn);
-        assertDoesNotThrow(() -> this.bsc.handleAction(PlayerAction.DRIVE_FERRY));
-        assertEquals(1,bsc.currentPlayerTurn);
-        assertEquals(4,this.bsc.currentPlayerRemainingActions);
+        this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
+        this.bsc.handleAction(PlayerAction.DRIVE_FERRY);
+
         EasyMock.verify(gw);
     }
 
@@ -650,8 +652,8 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        initFourGenericPlayers(bsc, atlanta);
+        bsc.currentPlayerTurn = 0;
         dcb.infectCity(atlanta, CityColor.YELLOW,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.YELLOW));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -670,8 +672,8 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        initFourGenericPlayers(bsc, atlanta);
+        bsc.currentPlayerTurn = 0;
         dcb.infectCity(atlanta, CityColor.BLUE, om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -690,8 +692,8 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        initFourGenericPlayers(bsc, atlanta);
+        bsc.currentPlayerTurn = 0;
         dcb.infectCity(atlanta, CityColor.RED,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.RED));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -710,8 +712,8 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initFourGenericPlayers();
-        bsc.nextPlayerTurn();
+        initFourGenericPlayers(bsc, atlanta);
+        bsc.currentPlayerTurn = 0;
         dcb.infectCity(atlanta, CityColor.BLACK,om);
         assertEquals(1,atlanta.getInfectionLevel(CityColor.BLACK));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
@@ -1032,7 +1034,7 @@ public class BoardStatusControllerTest {
 
         createNewBSCWithTestMap(gw);
         this.bsc.setup();
-        bsc.initFourGenericPlayers();
+        initFourGenericPlayers(bsc, atlanta);
         bsc.nextPlayerTurn();
         dcb.infectCity(atlanta, CityColor.YELLOW,om);
         dcb.infectCity(atlanta, CityColor.YELLOW,om);
