@@ -41,7 +41,7 @@ public class GameWindow implements GameWindowInterface {
 
         this.gameBoard = new GameBoard(cities);
         this.gamePanel.add(gameBoard, BorderLayout.CENTER);
-        this.gameBoard.setPreferredSize(Pandemic.BOARD_SIZE);
+        this.gameBoard.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH, Pandemic.BOARD_HEIGHT));
 
         this.actionsPanel = new ActionsPanel();
         actionsPanel.setOpaque(false);
@@ -80,15 +80,15 @@ public class GameWindow implements GameWindowInterface {
         currentPlayerIndicator.updateValue(nextPlayerName);
     }
 
-    public String promptSelectOption(String[] options, String title, String message) {
+    public String promptSelectOption(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
         return (String) JOptionPane.showInputDialog(
                 promptFrame,
-                message,
-                title,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                options,
+                inputs.selectionValues,
                 null);
     }
 
@@ -140,40 +140,42 @@ public class GameWindow implements GameWindowInterface {
         JOptionPane.showMessageDialog(this.gamePanel, message, title, type);
     }
 
-    public Player promptSelectPlayer(Player[] options, String title, String message) {
+    public Player promptSelectPlayer(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (Player) JOptionPane.showInputDialog(
-                promptFrame, message,
-                title,
+                promptFrame,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                options,
+                inputs.selectionValues,
                 null);
     }
 
-    public InfectionCard promptInfectionCard(InfectionCard[] infectionCards, String title, String message) {
+    public InfectionCard promptInfectionCard(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (InfectionCard) JOptionPane.showInputDialog(
-                promptFrame, message,
-                title,
+                promptFrame,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                infectionCards,
+                inputs.selectionValues,
                 null);
     }
 
-    public PlayerCard promptSelectPlayerCard(PlayerCard[] playerCards, String title, String message) {
+    public PlayerCard promptSelectPlayerCard(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (PlayerCard) JOptionPane.showInputDialog(
                 promptFrame,
-                message,
-                title,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                playerCards,
+                inputs.selectionValues,
                 null);
     }
 

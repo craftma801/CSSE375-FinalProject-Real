@@ -186,25 +186,25 @@ public class BoardStatusController {
     }
 
     public void handleTakeKnowledge() {
-        Player takingFrom = gameWindow.promptSelectPlayer(players, bundle.getString("knowledge.take"), bundle.getString("selectThePlayerYouWouldLikeToTakeFrom"));
+        Player takingFrom = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("knowledge.take"), bundle.getString("selectThePlayerYouWouldLikeToTakeFrom")));
         if (takingFrom == null) {
             actionAftermath(false);
             throw new ActionFailedException("Failed to take knowledge");
         }
-        PlayerCard taking = gameWindow.promptSelectPlayerCard(takingFrom.getCardsInHand().toArray(new PlayerCard[0]),
-                bundle.getString("knowledge.share"), bundle.getString("selectCardToShare"));
+        PlayerCard taking = gameWindow.promptSelectPlayerCard(new PromptWindowInputs(takingFrom.getCardsInHand().toArray(new PlayerCard[0]),
+                bundle.getString("knowledge.share"), bundle.getString("selectCardToShare")));
         players[currentPlayerTurn].shareKnowledgeTake(takingFrom, taking);
         actionAftermath(true);
     }
 
     private void handleGiveKnowledge() {
-        Player givingTo = gameWindow.promptSelectPlayer(players, bundle.getString("knowledge.give"), bundle.getString("selectThePlayerYouWouldLikeToGiveTo"));
+        Player givingTo = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("knowledge.give"), bundle.getString("selectThePlayerYouWouldLikeToGiveTo")));
         if (givingTo == null) {
             actionAftermath(false);
             return;
         }
-        PlayerCard giving = gameWindow.promptSelectPlayerCard(players[currentPlayerTurn].getCardsInHand().toArray(new PlayerCard[0]),
-                bundle.getString("knowledge.share"), bundle.getString("selectCardToShare"));
+        PlayerCard giving = gameWindow.promptSelectPlayerCard(new PromptWindowInputs(players[currentPlayerTurn].getCardsInHand().toArray(new PlayerCard[0]),
+                bundle.getString("knowledge.share"), bundle.getString("selectCardToShare")));
         if (giving == null) {
             actionAftermath(false);
             return;
@@ -323,18 +323,18 @@ public class BoardStatusController {
 
     private void operationsExpertRoleAction(Player currentPlayer) {
         String[] possibleDestinations = getCityNames();
-        String destinationName = gameWindow.promptSelectOption(possibleDestinations,
-                bundle.getString("selectALocation"), bundle.getString("whereWouldYouLikeToGo"));
+        String destinationName = gameWindow.promptSelectOption(new PromptWindowInputs(possibleDestinations,
+                bundle.getString("selectALocation"), bundle.getString("whereWouldYouLikeToGo")));
 
         String[] possibleCardsToDiscard = currentPlayer.getCardNames().toArray(new String[0]);
-        String cardNameToDiscard = gameWindow.promptSelectOption(possibleCardsToDiscard,
-                bundle.getString("selectACard"), bundle.getString("whichCardWouldYouLikeToDiscard"));
+        String cardNameToDiscard = gameWindow.promptSelectOption(new PromptWindowInputs(possibleCardsToDiscard,
+                bundle.getString("selectACard"), bundle.getString("whichCardWouldYouLikeToDiscard")));
 
         actionAftermath(((OperationsExpert) currentPlayer).operationsExpertAction(getCityByName(destinationName), cardNameToDiscard));
     }
 
     private void dispatcherRoleAction() {
-        Player selectedPlayer = gameWindow.promptSelectPlayer(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove"));
+        Player selectedPlayer = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove")));
         HashSet<City> possibleLocations = new HashSet<>();
         for (Player player : players) {
             possibleLocations.add(player.getCity());
@@ -531,7 +531,7 @@ public class BoardStatusController {
     }
 
     public void airLift() {
-        Player selectedPlayer = gameWindow.promptSelectPlayer(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove"));
+        Player selectedPlayer = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("moveAPlayer"), bundle.getString("selectThePlayerYouWouldLikeToMove")));
         CompletableFuture<City> userSelection = gameWindow.selectCity(new HashSet<>(cityMap));
         userSelection.thenAccept(selectedPlayer::forceRelocatePlayer); //Method reference
     }
@@ -555,17 +555,17 @@ public class BoardStatusController {
             gameWindow.displayInfectionCards(cardsToRearrange, bundle.getString("topOfInfectionDeck"));
 
             String[] options = new String[]{bundle.getString("continueRearranging"), bundle.getString("putCardsBackOnDeck")};
-            String nextAction = gameWindow.promptSelectOption(options,
-                    bundle.getString("selectAnOption"), bundle.getString("wouldYouLikeToContinueRearrangingTheTopOfTheInfectionDeck"));
+            String nextAction = gameWindow.promptSelectOption(new PromptWindowInputs(options,
+                    bundle.getString("selectAnOption"), bundle.getString("wouldYouLikeToContinueRearrangingTheTopOfTheInfectionDeck")));
             if (nextAction == null || !nextAction.equals(bundle.getString("continueRearranging"))) {
                 gameWindow.destroyCurrentInfectionCardsDialog();
                 break;
             }
 
-            InfectionCard firstCardToSwap = gameWindow.promptInfectionCard(cardsToRearrange,
-                    bundle.getString("selectACard"), bundle.getString("selectTheFirstCardToSwap"));
-            InfectionCard secondCardToSwap = gameWindow.promptInfectionCard(cardsToRearrange,
-                    bundle.getString("selectACard"), bundle.getString("selectTheSecondCardToSwap"));
+            InfectionCard firstCardToSwap = gameWindow.promptInfectionCard(new PromptWindowInputs(cardsToRearrange,
+                    bundle.getString("selectACard"), bundle.getString("selectTheFirstCardToSwap")));
+            InfectionCard secondCardToSwap = gameWindow.promptInfectionCard(new PromptWindowInputs(cardsToRearrange,
+                    bundle.getString("selectACard"), bundle.getString("selectTheSecondCardToSwap")));
             swapCards(cardsToRearrange, firstCardToSwap, secondCardToSwap);
             gameWindow.destroyCurrentInfectionCardsDialog();
         }
@@ -600,9 +600,8 @@ public class BoardStatusController {
     }
 
     public void resilientPopulation() {
-        InfectionCard cardToRemove = gameWindow.promptInfectionCard(infectionDiscardPile.toArray(new InfectionCard[0]),
-                bundle.getString("removeAnInfectionCard"), bundle.getString("selectAnInfectionCardToRemoveFromTheGame"));
-
+        InfectionCard cardToRemove = gameWindow.promptInfectionCard(new PromptWindowInputs(infectionDiscardPile.toArray(new InfectionCard[0]),
+                bundle.getString("removeAnInfectionCard"), bundle.getString("selectAnInfectionCardToRemoveFromTheGame")));
         infectionDiscardPile.remove(cardToRemove);
     }
 
@@ -653,8 +652,8 @@ public class BoardStatusController {
                 cardNamesToSelectFrom[i] = currentPlayer.cardsInHand.get(i).name;
             }
 
-            String cardToDiscardName = gameWindow.promptSelectOption(cardNamesToSelectFrom,
-                    bundle.getString("yourHandIsFull"), bundle.getString("selectACardToDiscard"));
+            String cardToDiscardName = gameWindow.promptSelectOption(new PromptWindowInputs(cardNamesToSelectFrom,
+                    bundle.getString("yourHandIsFull"), bundle.getString("selectACardToDiscard")));
             if (cardToDiscardName != null) {
                 currentPlayer.discardCardWithName(cardToDiscardName);
             }
