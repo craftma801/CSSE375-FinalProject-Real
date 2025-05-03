@@ -77,10 +77,10 @@ public class BoardStatusControllerTest {
                 .withPlayers(4)
                 .withEpidemicCards(4)
                 .build();
-        assertEquals(0, this.bsc.infectionDeckSize());
+        assertEquals(0, this.bsc.infectionDeck.size());
         this.bsc.setup();
-        assertEquals(48, this.bsc.infectionDeckSize());
-        assertEquals(0, this.bsc.infectionDiscardPileSize());
+        assertEquals(48, this.bsc.infectionDeck.size());
+        assertEquals(0, this.bsc.infectionDiscardPile.size());
     }
 
     @Test
@@ -94,8 +94,8 @@ public class BoardStatusControllerTest {
                 .build();
         this.bsc.setup();
         this.bsc.startGame();
-        assertEquals(39, this.bsc.infectionDeckSize());
-        assertEquals(9, this.bsc.infectionDiscardPileSize());
+        assertEquals(39, this.bsc.infectionDeck.size());
+        assertEquals(9, this.bsc.infectionDiscardPile.size());
     }
 
     @Test
@@ -354,7 +354,7 @@ public class BoardStatusControllerTest {
         this.bsc = testBSC.build();
         InfectionCard cardToAdd = new InfectionCard(testBSC.atlanta);
         bsc.infectionDeck.add(cardToAdd);
-        bsc.oneQuietNight();
+        bsc.isQuietNight = true;
         bsc.infectCitiesBasedOnInfectionRate();
         assertEquals(0, testBSC.atlanta.getInfectionLevel(CityColor.BLUE));
     }
@@ -378,14 +378,14 @@ public class BoardStatusControllerTest {
         EasyMock.expect(mockedGameWindow.promptInfectionCard(anyObject())).andReturn(atlantaCard);
         EasyMock.replay(mockedGameWindow);
 
-        assertEquals(3, bsc.infectionDiscardPileSize());
+        assertEquals(3, bsc.infectionDiscardPile.size());
         assertEquals(0, bsc.playerDiscardPile.size());
         assertTrue(bsc.infectionDiscardPile.contains(atlantaCard));
 
         EventCard resilientPopulationCard = new EventCard(EventName.RESILIENT_POPULATION, bsc);
         resilientPopulationCard.use();
 
-        assertEquals(2, bsc.infectionDiscardPileSize());
+        assertEquals(2, bsc.infectionDiscardPile.size());
         assertFalse(bsc.infectionDiscardPile.contains(atlantaCard));
         assertTrue(bsc.playerDiscardPile.contains(resilientPopulationCard));
         EasyMock.verify(mockedGameWindow);
@@ -504,7 +504,7 @@ public class BoardStatusControllerTest {
         this.bsc.initializePlayers();
         this.bsc.nextPlayerTurn();
 
-        while (bsc.playerDeckSize() > 1) {
+        while (bsc.playerDeck.size() > 1) {
             assertTrue(bsc.drawTwoPlayerCards());
         }
         assertFalse(bsc.drawTwoPlayerCards());
@@ -521,10 +521,10 @@ public class BoardStatusControllerTest {
         this.bsc = testBSC.build();
 
         this.bsc.setup();
-        assertEquals(48, this.bsc.playerDeckSize());
+        assertEquals(48, this.bsc.playerDeck.size());
 
         this.bsc.startGame();
-        assertEquals(49, this.bsc.playerDeckSize());
+        assertEquals(49, this.bsc.playerDeck.size());
 
         ArrayList<String> playerDeckCardNames = new ArrayList<>();
         for (PlayerCard playerCard : this.bsc.playerDeck) {
@@ -617,7 +617,7 @@ public class BoardStatusControllerTest {
                 .build();
         bsc.setup();
         bsc.startGame();
-        assertEquals(49, bsc.playerDeckSize());
+        assertEquals(49, bsc.playerDeck.size());
     }
 
     @Test
