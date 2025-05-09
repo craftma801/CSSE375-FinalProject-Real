@@ -43,7 +43,7 @@ jobs:
           CI: true
 
       - name: Upload JAR as Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: CSSE376-S2G2-JAR
           path: artifacts/
