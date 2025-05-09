@@ -274,6 +274,12 @@ public class GameWindow implements GameWindowInterface {
         }
         dialog.setVisible(true);
         viewCardsOpen = true;
+        dialog.setDefaultCloseOperation(setViewCardsOpen(false));
+    }
+
+    private int setViewCardsOpen(Boolean open) {
+        this.viewCardsOpen = open;
+        return 1;
     }
 
     public static Locale selectLocale(String message){
