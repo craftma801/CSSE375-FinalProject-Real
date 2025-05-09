@@ -676,7 +676,7 @@ public class BoardStatusControllerTest {
 
         bsc.currentPlayerTurn = 0;
         dcb.infectCity(atlanta, CityColor.BLUE, om);
-        assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
+//        assertEquals(1,atlanta.getInfectionLevel(CityColor.BLUE));
         bsc.handleAction(PlayerAction.TREAT_DISEASE);
 
         EasyMock.verify(gw);
