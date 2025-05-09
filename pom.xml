@@ -17,6 +17,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+<!--        <maven.test.skip>true</maven.test.skip>-->
     </properties>
     <dependencies>
         <dependency>
@@ -100,16 +101,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*.properties</include>
-                        <include>**/*.json</include>
-                        <include>**/*.svg</include>
-                        <include>**/*.jpg</include>
-                        <include>**/*.png</include>
-                        <include>**/*.txt</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
