@@ -287,7 +287,7 @@ public class GameWindow implements GameWindowInterface {
         ArrayList<Locale> locales = new ArrayList<>();
         Scanner scanner;
         try {
-            scanner = new Scanner(new File("translations/supportedLocales.csv"));
+            scanner = new Scanner(new File("src/main/resources/supportedLocales.csv"));
         } catch (FileNotFoundException e) {
             return new Locale("en", "US");
         }

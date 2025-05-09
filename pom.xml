@@ -83,16 +83,13 @@
     <build>
         <resources>
             <resource>
-                <directory>translations</directory>
+                <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*.properties</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>assets</directory>
-                <includes>
-                    <include>**/*</include>
+                    <include>**/*.json</include>
+                    <include>**/*.map</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.csv</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
@@ -101,6 +98,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>main.Pandemic</mainClass>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
