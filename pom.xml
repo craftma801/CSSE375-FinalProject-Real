@@ -10,8 +10,8 @@
         <relativePath/>
     </parent>
     <groupId>groupId</groupId>
-    <artifactId>CSSE376-S2G2</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>Pandemic</artifactId>
+    <version>1.0-CSSE375</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
