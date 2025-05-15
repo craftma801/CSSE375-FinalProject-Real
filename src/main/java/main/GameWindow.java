@@ -2,6 +2,8 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
@@ -231,9 +233,11 @@ public class GameWindow implements GameWindowInterface {
     }
 
     public void displayPlayerCards(Player[] players, Player currentPlayer) {
-        if(viewCardsOpen){
+        if (viewCardsOpen)
             return;
-        }
+        else
+            viewCardsOpen = true;
+
         JPanel viewCardsPanel = new JPanel();
         GridLayout viewCardsLayout = new GridLayout(2, 2);
         viewCardsPanel.setLayout(viewCardsLayout);
@@ -269,12 +273,19 @@ public class GameWindow implements GameWindowInterface {
         }
         dialog.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH / 2, Pandemic.BOARD_HEIGHT / 2));
         dialog.pack();
-        if(viewCardsOpen){
-            dialog.remove(viewCardsPanel);
-        }
         dialog.setVisible(true);
-        viewCardsOpen = true;
-        dialog.setDefaultCloseOperation(setViewCardsOpen(false));
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                viewCardsOpen = false;
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                viewCardsOpen = false;
+            }
+        });
     }
 
     private int setViewCardsOpen(Boolean open) {
