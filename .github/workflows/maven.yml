@@ -35,6 +35,9 @@ jobs:
         env:
           CI: true
 
+      - name: Bundle Resources
+        run: ls -l
+
       - name: Copy JAR to output directory
         run: |
           mkdir -p artifacts
