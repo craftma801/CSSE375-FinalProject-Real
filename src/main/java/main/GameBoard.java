@@ -27,7 +27,7 @@ public class GameBoard extends JComponent {
         Graphics2D graphics2D = ((Graphics2D) graphics);
         super.paintComponent(graphics2D);
         Dimension boardSize = this.getSize();
-        graphics.drawImage(Toolkit.getDefaultToolkit().getImage("src/main/resources/PandemicBoard.png"), 0, 0, boardSize.width, boardSize.height, this);
+        graphics.drawImage(Toolkit.getDefaultToolkit().getImage("resources/PandemicBoard.png"), 0, 0, boardSize.width, boardSize.height, this);
         double xScale = boardSize.width / (double) Pandemic.BOARD_WIDTH;
         double yScale = boardSize.height / (double) Pandemic.BOARD_HEIGHT;
         City.setUIScale(xScale, yScale);

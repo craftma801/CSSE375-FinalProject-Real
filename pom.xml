@@ -83,7 +83,7 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>resources</directory>
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.json</include>

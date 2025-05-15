@@ -35,7 +35,7 @@ public class Player {
     }
 
     private void generateIcon() {
-        Image pawnImage = Toolkit.getDefaultToolkit().getImage("src/main/resources/pawn.png");
+        Image pawnImage = Toolkit.getDefaultToolkit().getImage("resources/pawn.png");
         ImageFilter colorFilter = new RGBImageFilter() {
             @Override
             public int filterRGB(int x, int y, int rgb) {

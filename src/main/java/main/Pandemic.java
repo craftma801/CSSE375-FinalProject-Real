@@ -48,7 +48,7 @@ public class Pandemic {
 
     public static List<CityData> loadCityData() {
         try {
-            File file = new File("src/main/resources/map.json");
+            File file = new File("resources/map.json");
             ObjectMapper mapper = new ObjectMapper();
             CityData[] cityArray = mapper.readValue(file, CityData[].class);
             return Arrays.asList(cityArray);
