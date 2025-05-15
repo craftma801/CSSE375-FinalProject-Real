@@ -11,7 +11,7 @@
     </parent>
     <groupId>groupId</groupId>
     <artifactId>Pandemic</artifactId>
-    <version>1.0-CSSE375</version>
+    <version>1.1-CSSE375</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
