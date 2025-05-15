@@ -36,14 +36,7 @@ jobs:
           CI: true
 
       - name: Bundle Resources
-        run: ls -l
-
-      - name: Copy JAR to output directory
-        run: |
-          mkdir -p artifacts
-          find target -name "*.jar" -exec cp {} artifacts/ \;
-        env:
-          CI: true
+        run: ./package.sh
 
       - name: Upload JAR as Build Artifact
         uses: actions/upload-artifact@v4
