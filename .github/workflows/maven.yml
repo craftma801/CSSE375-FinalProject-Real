@@ -41,8 +41,8 @@ jobs:
       - name: Upload JAR as Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PAMDEMIC-GAME-JAR
-          path: artifacts/
+          name: Pandemic
+          path: artifacts/pandemic.zip
 
   test:
     runs-on: ubuntu-latest
