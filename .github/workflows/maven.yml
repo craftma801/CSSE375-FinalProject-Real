@@ -16,18 +16,48 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-    - name: Run tests with Maven
-      run: mvn -B test --file pom.xml
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Build JAR without Tests
+        run: mvn clean package -DskipTests
+        env:
+          CI: true
+
+      - name: Bundle Resources
+        run: ./package.sh
+
+      - name: Upload JAR as Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pandemic
+          path: artifacts/pandemic.zip
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Tests
+        run: mvn clean test
+        env:
+          CI: true

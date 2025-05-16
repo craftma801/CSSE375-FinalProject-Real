@@ -1,13 +1,16 @@
 package main;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
 public class Pandemic {
     public static final int BOARD_WIDTH = 2200;
     public static final int BOARD_HEIGHT = 1400;
-    public static final Dimension BOARD_SIZE = new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
     private static BoardStatusController boardStatusController;
     public static ResourceBundle bundle;
     public static Locale locale;
@@ -37,10 +40,21 @@ public class Pandemic {
     }
 
     public static ArrayList<City> createMap() {
-        List<CityData> cityDataList = WorldMapLoader.loadCityData();
+        List<CityData> cityDataList = loadCityData();
         Map<String, City> cityMap = createCities(cityDataList);
         addConnections(cityMap, cityDataList);
         return new ArrayList<>(cityMap.values());
+    }
+
+    public static List<CityData> loadCityData() {
+        try {
+            File file = new File("resources/map.json");
+            ObjectMapper mapper = new ObjectMapper();
+            CityData[] cityArray = mapper.readValue(file, CityData[].class);
+            return Arrays.asList(cityArray);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading map.json" + e);
+        }
     }
 
     private static Map<String, City> createCities(List<CityData> cityDataList) {

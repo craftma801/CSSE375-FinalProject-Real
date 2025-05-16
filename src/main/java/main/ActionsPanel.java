@@ -44,69 +44,71 @@ public class ActionsPanel extends JPanel {
 
         this.buildResearchStationButton = new ActionButton(bundle.getString("buildResearchStation"));
         this.buildResearchStationButton.setToolTipText(this.formatToolTip(
-                "Discard the City card that matches the city you are in to place a research",
-                "station there. Take the research station from the pile next to the board. If all",
-                "6 research stations have been built, take a research station from anywhere",
-                "on the board."));
+                bundle.getString("buildResearchStationTTL1"),
+                bundle.getString("buildResearchStationTTL2"),
+                bundle.getString("buildResearchStationTTL3"),
+                bundle.getString("buildResearchStationTTL4")));
         this.treatDiseaseButton = new ActionButton(bundle.getString("treatDisease"));
         this.treatDiseaseButton.setToolTipText(this.formatToolTip(
-                "Remove 1 disease cube from the city you are in, placing it in the cube",
-                "supply next to the board. If this disease color has been cured (see",
-                "Discover a Cure below), remove all cubes of that color from the city you",
-                "are in.",
-                "If the last cube of a cured disease is removed from the board, this disease",
-                "is eradicated."));
+                bundle.getString("treatDiseaseTTL1"),
+                bundle.getString("treatDiseaseTTL2"),
+                bundle.getString("treatDiseaseTTL3"),
+                bundle.getString("treatDiseaseTTL4"),
+                bundle.getString("treatDiseaseTTL5"),
+                bundle.getString("treatDiseaseTTL6")));
         this.takeKnowledgeButton = new ActionButton(bundle.getString("knowledge.take"));
         this.takeKnowledgeButton.setToolTipText(this.formatToolTip(
-                "Take the City card that matches the city you are in to another player.",
-                "The other player must also be in the city with you. Both of you need to",
-                "agree to do this.",
-                "If the player who gets the card now has more than 7 cards, that player must",
-                "immediately discard a card or play an Event card."));
+                bundle.getString("takeKnowledgeTTL1"),
+                bundle.getString("takeKnowledgeTTL2"),
+                bundle.getString("takeKnowledgeTTL3"),
+                bundle.getString("takeKnowledgeTTL4"),
+                bundle.getString("takeKnowledgeTTL5")));
         this.giveKnowledgeButton = new ActionButton(bundle.getString("knowledge.give"));
         this.giveKnowledgeButton.setToolTipText(this.formatToolTip(
-                "Give the City card that matches the city you are in to another player.",
-                "The other player must also be in the city with you. Both of you need to",
-                "agree to do this.",
-                "If the player who gets the card now has more than 7 cards, that player must",
-                "immediately discard a card or play an Event card."));
+                bundle.getString("giveKnowledgeTTL1"),
+                bundle.getString("giveKnowledgeTTL2"),
+                bundle.getString("giveKnowledgeTTL3"),
+                bundle.getString("giveKnowledgeTTL4"),
+                bundle.getString("giveKnowledgeTTL5")));
         this.discoverCureButton = new ActionButton(bundle.getString("discoverCure"));
         this.discoverCureButton.setToolTipText(this.formatToolTip(
-                "At any research station, discard 5 City cards of the same color from your",
-                "hand to cure the disease of that color. Move the disease’s cure marker to its",
-                "Cure Indicator.",
-                "If no cubes of this color are on the board, this disease is now eradicated."));
+                bundle.getString("discoverCureTTL1"),
+                bundle.getString("discoverCureTTL2"),
+                bundle.getString("discoverCureTTL3"),
+                bundle.getString("discoverCureTTL4")));
 
         this.driveFerryButton = new ActionButton(bundle.getString("driveOrFerry"));
         this.driveFerryButton.setToolTipText(this.formatToolTip(
-                "Move to a city connected by a white line to the one you are in."));
+                bundle.getString("driveFerryTTL1")));
         this.directFlightButton = new ActionButton(bundle.getString("flight.direct"));
         this.directFlightButton.setToolTipText(this.formatToolTip(
-                "Discard a City card to move to the city named on the card."));
+                bundle.getString("directFlightTTL1")));
         this.charterFlightButton = new ActionButton(bundle.getString("flight.charter"));
         this.charterFlightButton.setToolTipText(this.formatToolTip(
-                "Discard the City card that matches the city you are in to move to any city."));
+                bundle.getString("charterFlightTTL1")));
         this.shuttleFlightButton = new ActionButton(bundle.getString("flight.shuttle"));
         this.shuttleFlightButton.setToolTipText(this.formatToolTip(
-                "Move from a city with a research station to any other city that has a",
-                "research station."));
+                bundle.getString("shuttleFlightTTL1"),
+                bundle.getString("shuttleFlightTTL2")));
 
         this.viewCardsButton = new ActionButton(bundle.getString("viewCards"));
         this.viewCardsButton.setToolTipText(this.formatToolTip(
-                "Look at the cards in every player's hand."));
+                bundle.getString("viewCardsTTL1")));
         this.playEventCardButton = new ActionButton(bundle.getString("playAnEventCard"));
         this.playEventCardButton.setToolTipText(this.formatToolTip(
-                "During a turn, any player may play Event cards. Playing",
-                "an Event card is not an action. The player who plays an",
-                "Event card decides how it is used.",
-                "Event cards can be played at any time, except in between",
-                "drawing and resolving a card."));
+                bundle.getString("playEventCardTTL1"),
+                bundle.getString("playEventCardTTL2"),
+                bundle.getString("playEventCardTTL3"),
+                bundle.getString("playEventCardTTL4"),
+                bundle.getString("playEventCardTTL5")));
         this.performRoleActionButton = new ActionButton(bundle.getString("performRoleAction"));
         this.performRoleActionButton.setToolTipText(this.formatToolTip(
-                "Perform a role-specific action."));
+                bundle.getString("performRoleActionTTL1")));
         this.skipActionButton = new ActionButton(bundle.getString("skipAction"));
         this.skipActionButton.setToolTipText(this.formatToolTip(
-                "Skip one of your actions."));
+                bundle.getString("skipActionTTL1")));
+
+        ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
         setUpActionListeners();
         addAllElementsToThisPanel();

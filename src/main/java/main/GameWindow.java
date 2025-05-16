@@ -2,6 +2,8 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
@@ -41,7 +43,7 @@ public class GameWindow implements GameWindowInterface {
 
         this.gameBoard = new GameBoard(cities);
         this.gamePanel.add(gameBoard, BorderLayout.CENTER);
-        this.gameBoard.setPreferredSize(Pandemic.BOARD_SIZE);
+        this.gameBoard.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH, Pandemic.BOARD_HEIGHT));
 
         this.actionsPanel = new ActionsPanel();
         actionsPanel.setOpaque(false);
@@ -80,15 +82,15 @@ public class GameWindow implements GameWindowInterface {
         currentPlayerIndicator.updateValue(nextPlayerName);
     }
 
-    public String promptSelectOption(String[] options, String title, String message) {
+    public String promptSelectOption(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
         return (String) JOptionPane.showInputDialog(
                 promptFrame,
-                message,
-                title,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                options,
+                inputs.selectionValues,
                 null);
     }
 
@@ -140,40 +142,42 @@ public class GameWindow implements GameWindowInterface {
         JOptionPane.showMessageDialog(this.gamePanel, message, title, type);
     }
 
-    public Player promptSelectPlayer(Player[] options, String title, String message) {
+    public Player promptSelectPlayer(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (Player) JOptionPane.showInputDialog(
-                promptFrame, message,
-                title,
+                promptFrame,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                options,
+                inputs.selectionValues,
                 null);
     }
 
-    public InfectionCard promptInfectionCard(InfectionCard[] infectionCards, String title, String message) {
+    public InfectionCard promptInfectionCard(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (InfectionCard) JOptionPane.showInputDialog(
-                promptFrame, message,
-                title,
+                promptFrame,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                infectionCards,
+                inputs.selectionValues,
                 null);
     }
 
-    public PlayerCard promptSelectPlayerCard(PlayerCard[] playerCards, String title, String message) {
+    public PlayerCard promptSelectPlayerCard(PromptWindowInputs inputs) {
         JFrame promptFrame = new JFrame();
 
         return (PlayerCard) JOptionPane.showInputDialog(
                 promptFrame,
-                message,
-                title,
+                inputs.message,
+                inputs.title,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
-                playerCards,
+                inputs.selectionValues,
                 null);
     }
 
@@ -229,9 +233,11 @@ public class GameWindow implements GameWindowInterface {
     }
 
     public void displayPlayerCards(Player[] players, Player currentPlayer) {
-        if(viewCardsOpen){
+        if (viewCardsOpen)
             return;
-        }
+        else
+            viewCardsOpen = true;
+
         JPanel viewCardsPanel = new JPanel();
         GridLayout viewCardsLayout = new GridLayout(2, 2);
         viewCardsPanel.setLayout(viewCardsLayout);
@@ -267,11 +273,19 @@ public class GameWindow implements GameWindowInterface {
         }
         dialog.setPreferredSize(new Dimension(Pandemic.BOARD_WIDTH / 2, Pandemic.BOARD_HEIGHT / 2));
         dialog.pack();
-        if(viewCardsOpen){
-            dialog.remove(viewCardsPanel);
-        }
         dialog.setVisible(true);
-        viewCardsOpen = true;
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                viewCardsOpen = false;
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                viewCardsOpen = false;
+            }
+        });
     }
 
     public static Locale selectLocale(String message){
@@ -279,7 +293,7 @@ public class GameWindow implements GameWindowInterface {
         ArrayList<Locale> locales = new ArrayList<>();
         Scanner scanner;
         try {
-            scanner = new Scanner(new File("translations/supportedLocales.csv"));
+            scanner = new Scanner(new File("resources/supportedLocales.csv"));
         } catch (FileNotFoundException e) {
             return new Locale("en", "US");
         }
