@@ -288,11 +288,6 @@ public class GameWindow implements GameWindowInterface {
         });
     }
 
-    private int setViewCardsOpen(Boolean open) {
-        this.viewCardsOpen = open;
-        return 1;
-    }
-
     public static Locale selectLocale(String message){
         JFrame promptFrame = new JFrame();
         ArrayList<Locale> locales = new ArrayList<>();
