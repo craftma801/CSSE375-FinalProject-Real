@@ -1,5 +1,6 @@
 package main;
 
+import main.actions.*;
 import main.roles.*;
 
 import javax.swing.*;
@@ -35,6 +36,8 @@ public class BoardStatusController {
 
     public final ResourceBundle bundle;
     private final EventCardManager eventCardManager;
+
+    private Map<PlayerAction, ActionHandler> actionHandlers;
 
     public BoardStatusController(GameWindowInterface gameWindow, ArrayList<City> cityMap, int numPlayers, int numEpidemicCards) {
         if (Pandemic.bundle != null) {
@@ -75,32 +78,23 @@ public class BoardStatusController {
         this.gameOver = false;
 
         this.cityMap = cityMap;
+
+        initializeActionHandlers();
     }
 
     public void handleAction(PlayerAction playerAction) {
         try {
-            switch (playerAction) {
-                case BUILD_RESEARCH_STATION -> handleBuildResearchStation();
-                case TREAT_DISEASE -> handleTreatDisease();
-                case GIVE_KNOWLEDGE -> handleGiveKnowledge();
-                case TAKE_KNOWLEDGE -> handleTakeKnowledge();
-                case DISCOVER_CURE -> handleDiscoverCure(players[currentPlayerTurn]);
-                case DRIVE_FERRY -> handleDriveFerry();
-                case DIRECT_FLIGHT -> handleDirectFlight();
-                case CHARTER_FLIGHT -> handleCharterFlight();
-                case SHUTTLE_FLIGHT -> handleShuttleFlight();
-                case VIEW_CARDS -> handleViewCards(players[currentPlayerTurn]);
-                case PLAY_EVENT_CARD -> eventCardManager.handlePlayEventCard(players[currentPlayerTurn]);
-                case ROLE_ACTION -> handleRoleAction(players[currentPlayerTurn]);
-                case SKIP_ACTION -> actionAftermath(true);
-            };
+            ActionHandler handler = actionHandlers.get(playerAction);
+            if (handler == null) {
+                throw new IllegalArgumentException("No handler found for action: " + playerAction);
+            }
+            handler.handle();
         } catch (ActionFailedException e) {
             handleActionFailure(e);
-            return;
         }
     }
 
-    private void actionAftermath(boolean actionWasPerformed) {
+    public void actionAftermath(boolean actionWasPerformed) {
         if (actionWasPerformed) {
             currentPlayerRemainingActions--;
             gameWindow.updateRemainingActions(currentPlayerRemainingActions);
@@ -119,7 +113,7 @@ public class BoardStatusController {
         }
     }
 
-    private void handleBuildResearchStation() {
+    public void handleBuildResearchStation() {
         players[currentPlayerTurn].buildResearchStation();
         actionAftermath(true);
     }
@@ -167,7 +161,7 @@ public class BoardStatusController {
         actionAftermath(false);
     }
 
-    private void handleTreatDisease() {
+    public void handleTreatDisease() {
         CityColor[] colors = new CityColor[]{CityColor.YELLOW,
                 CityColor.RED,
                 CityColor.BLUE,
@@ -197,7 +191,7 @@ public class BoardStatusController {
         actionAftermath(true);
     }
 
-    private void handleGiveKnowledge() {
+    public void handleGiveKnowledge() {
         Player givingTo = gameWindow.promptSelectPlayer(new PromptWindowInputs(players, bundle.getString("knowledge.give"), bundle.getString("selectThePlayerYouWouldLikeToGiveTo")));
         if (givingTo == null) {
             actionAftermath(false);
@@ -285,7 +279,7 @@ public class BoardStatusController {
         gameEnd(GameEndCondition.WIN_ALL_FOUR_CURES_DISCOVERED);
     }
 
-    private void handleRoleAction(Player currentPlayer) {
+    public void handleRoleAction(Player currentPlayer) {
         Class<? extends Player> role = currentPlayer.getClass();
         if (!role.equals(OperationsExpert.class)) {
             if (role.equals(Dispatcher.class)) {
@@ -645,5 +639,30 @@ public class BoardStatusController {
 
     public int getNumPlayers() {
         return numPlayers;
+    }
+
+    private void initializeActionHandlers() {
+        actionHandlers = new EnumMap<>(PlayerAction.class);
+        actionHandlers.put(PlayerAction.BUILD_RESEARCH_STATION, new BuildResearchStationAction(this));
+        actionHandlers.put(PlayerAction.TREAT_DISEASE, new TreatDiseaseAction(this));
+        actionHandlers.put(PlayerAction.GIVE_KNOWLEDGE, new GiveKnowledgeAction(this));
+        actionHandlers.put(PlayerAction.TAKE_KNOWLEDGE, new TakeKnowledgeAction(this));
+        actionHandlers.put(PlayerAction.DISCOVER_CURE, new DiscoverCureAction(this));
+        actionHandlers.put(PlayerAction.DRIVE_FERRY, new DriveFerryAction(this));
+        actionHandlers.put(PlayerAction.DIRECT_FLIGHT, new DirectFlightAction(this));
+        actionHandlers.put(PlayerAction.CHARTER_FLIGHT, new CharterFlightAction(this));
+        actionHandlers.put(PlayerAction.SHUTTLE_FLIGHT, new ShuttleFlightAction(this));
+        actionHandlers.put(PlayerAction.VIEW_CARDS, new ViewCardsAction(this));
+        actionHandlers.put(PlayerAction.PLAY_EVENT_CARD, new PlayEventCardAction(this));
+        actionHandlers.put(PlayerAction.ROLE_ACTION, new RoleActionAction(this));
+        actionHandlers.put(PlayerAction.SKIP_ACTION, new SkipActionAction(this));
+    }
+
+    public Player getCurrentPlayer() {
+        return players[currentPlayerTurn];
+    }
+
+    public EventCardManager getEventCardManager() {
+        return eventCardManager;
     }
 }
