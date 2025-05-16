@@ -8,14 +8,14 @@ public interface GameWindowInterface {
 
     void showWindow();
     void displayNextPlayerInfo(String nextPlayerName, int remainingActions);
-    String promptSelectOption(String[] options, String title, String message);
+    String promptSelectOption(PromptWindowInputs inputs);
     void updateTreatmentIndicator(CityColor color, String message);
     String promptCureCards(String[] possibleValues);
     void showGameOverMessage(String message);
     void displayMessage(String title, String message, int type);
-    Player promptSelectPlayer(Player[] options, String title, String message);
-    InfectionCard promptInfectionCard(InfectionCard[] infectionCards, String title, String message);
-    PlayerCard promptSelectPlayerCard(PlayerCard[] playerCards, String title, String message);
+    Player promptSelectPlayer(PromptWindowInputs inputs);
+    InfectionCard promptInfectionCard(PromptWindowInputs inputs);
+    PlayerCard promptSelectPlayerCard(PromptWindowInputs inputs);
     void displayInfectionCards(InfectionCard[] cardsToDisplay, String title);
     CityColor promptColorToCure(CityColor[] colors);
     void repaintGameBoard();

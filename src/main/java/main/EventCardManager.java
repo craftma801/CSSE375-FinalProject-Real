@@ -20,8 +20,8 @@ public class EventCardManager {
             return false;
         }
 
-        EventCard eventCardToPlay = (EventCard) gameWindow.promptSelectPlayerCard(eventCardsInHand.toArray(new PlayerCard[0]),
-                bundle.getString("selectAnEventCard"), bundle.getString("whichEventCardWouldYouLikeToPlay"));
+        EventCard eventCardToPlay = (EventCard) this.gameWindow.promptSelectPlayerCard(new PromptWindowInputs(eventCardsInHand.toArray(new PlayerCard[0]),
+                bundle.getString("selectAnEventCard"), bundle.getString("whichEventCardWouldYouLikeToPlay")));
         if (eventCardToPlay == null) {
             return false;
         }
@@ -36,8 +36,8 @@ public class EventCardManager {
 
     public boolean givePlayerOptionToPlayEventCard(Player currentPlayer) {
         String[] options = new String[]{bundle.getString("playAnEventCard"), bundle.getString("discardACard")};
-        String choice = gameWindow.promptSelectOption(options,
-                bundle.getString("yourHandIsFull"), bundle.getString("youreHoldingAnEventCardWouldYouLikeToPlayItOrDiscardACard"));
+        String choice = gameWindow.promptSelectOption(new PromptWindowInputs(options,
+                bundle.getString("yourHandIsFull"), bundle.getString("youreHoldingAnEventCardWouldYouLikeToPlayItOrDiscardACard")));
 
         if (!choice.equals(bundle.getString("playAnEventCard"))) {
             return false;
@@ -45,8 +45,8 @@ public class EventCardManager {
 
         ArrayList<String> cardsToSelectFrom = getPossibleEventCardsToPlay(currentPlayer);
 
-        String selectedName = gameWindow.promptSelectOption(cardsToSelectFrom.toArray(new String[0]),
-                bundle.getString("playAnEventCard"), bundle.getString("selectAnEventCardToPlay"));
+        String selectedName = gameWindow.promptSelectOption(new PromptWindowInputs(cardsToSelectFrom.toArray(new String[0]),
+                bundle.getString("playAnEventCard"), bundle.getString("selectAnEventCardToPlay")));
 
         for (PlayerCard card : currentPlayer.cardsInHand) {
             if (card.name.equals(selectedName)) {
